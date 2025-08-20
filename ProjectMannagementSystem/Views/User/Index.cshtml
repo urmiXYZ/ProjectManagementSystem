@@ -1,0 +1,162 @@
+﻿@model IEnumerable<ProjectMannagementSystem.Models.User>
+
+@{
+    ViewData["Title"] = "User List";
+}
+
+<!-- Add New Button -->
+<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#userModal">
+    Add New <i class="fa fa-plus"></i>
+</button>
+
+<!-- User Table -->
+<table id="userTbl" class="table table-bordered">
+    <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Joined At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="userModalLabel">Add User</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="UserId" />
+                <div class="mb-3">
+                    <label for="UserName" class="form-label">Name:</label>
+                    <input type="text" id="UserName" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="Age" class="form-label">Age:</label>
+                    <input type="number" id="Age" class="form-control" min="18" max="70" />
+                </div>
+                <div class="mb-3">
+                    <label for="Email" class="form-label">Email:</label>
+                    <input type="email" id="Email" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="Phone" class="form-label">Phone:</label>
+                    <input type="text" id="Phone" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="JoinedAt" class="form-label">Joined At:</label>
+                    <input type="date" id="JoinedAt" class="form-control" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnUserSave">Save</button>
+                <button type="button" class="btn btn-success" id="btnUserUpdate">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#btnUserSave").show();
+            $("#btnUserUpdate").hide();
+            loadUsers();
+
+            $("#btnUserSave").click(function () {
+                $(this).prop("disabled", true);
+                var obj = {
+                    UserName: $("#UserName").val(),
+                    Age: $("#Age").val(),
+                    Email: $("#Email").val(),
+                    Phone: $("#Phone").val(),
+                    JoinedAt: $("#JoinedAt").val()
+                };
+                $.post('/User/Save', obj, function () {
+                    loadUsers();
+                    $("#userModal").modal('hide');
+                    clearUserForm();
+                    $("#btnUserSave").prop("disabled", false);
+                });
+            });
+
+            $("#btnUserUpdate").click(function () {
+                $(this).prop("disabled", true);
+                var obj = {
+                    UserId: $("#UserId").val(),
+                    UserName: $("#UserName").val(),
+                    Age: $("#Age").val(),
+                    Email: $("#Email").val(),
+                    Phone: $("#Phone").val(),
+                    JoinedAt: $("#JoinedAt").val()
+                };
+                $.post('/User/Update', obj, function () {
+                    loadUsers();
+                    $("#userModal").modal('hide');
+                    clearUserForm();
+                    $("#btnUserUpdate").prop("disabled", false);
+                });
+            });
+        });
+
+        function loadUsers() {
+            $.get('/User/Get', function (data) {
+                $('#userTbl tbody').empty();
+                $.each(data, function (i, user) {
+                    var row = `<tr>
+                        <td>${user.userId}</td>
+                        <td>${user.userName}</td>
+                        <td>${user.age}</td>
+                        <td>${user.email}</td>
+                        <td>${user.phone}</td>
+                        <td>${user.joinedAt.split('T')[0]}</td>
+                        <td>
+                            <button class='btn btn-warning' onclick='editUser(${user.userId})'><i class='fa fa-pencil'></i></button> |
+                            <button class='btn btn-danger' onclick='deleteUser(${user.userId})'><i class='fa fa-trash'></i></button>
+                        </td>
+                    </tr>`;
+                    $('#userTbl tbody').append(row);
+                });
+            });
+        }
+
+        function editUser(id) {
+            $.get('/User/GetById/' + id, function (user) {
+                $("#UserId").val(user.userId);
+                $("#UserName").val(user.userName);
+                $("#Age").val(user.age);
+                $("#Email").val(user.email);
+                $("#Phone").val(user.phone);
+                $("#JoinedAt").val(user.joinedAt.split('T')[0]);
+                $("#userModal").modal('show');
+                $("#btnUserSave").hide();
+                $("#btnUserUpdate").show();
+            });
+        }
+
+        function deleteUser(id) {
+            $.post('/User/Delete/' + id, function () {
+                loadUsers();
+            });
+        }
+
+        function clearUserForm() {
+            $("#UserId").val("");
+            $("#UserName").val("");
+            $("#Age").val("");
+            $("#Email").val("");
+            $("#Phone").val("");
+            $("#JoinedAt").val("");
+            $("#btnUserSave").show();
+            $("#btnUserUpdate").hide();
+        }
+    </script>
+}

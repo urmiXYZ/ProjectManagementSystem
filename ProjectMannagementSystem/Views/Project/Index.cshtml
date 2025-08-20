@@ -1,0 +1,179 @@
+﻿@model IEnumerable<ProjectMannagementSystem.Models.Project>
+
+@{
+    ViewData["Title"] = "Project List";
+}
+
+<!-- Add New Button -->
+<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+    Add New <i class="fa fa-plus" aria-hidden="true"></i>
+</button>
+
+<!-- Project Table -->
+<table id="tbl" class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Project ID</th>
+            <th>Project Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Project</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="ProjectId" />
+                <div class="mb-3">
+                    <label for="ProjectName" class="form-label">Name:</label>
+                    <input type="text" id="ProjectName" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="Description" class="form-label">Description:</label>
+                    <input type="text" id="Description" class="form-control" required />
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnSave">Save</button>
+                <button type="button" class="btn btn-success" id="btnUpdate">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#btnSave").show();
+            $("#btnUpdate").hide();
+            load();
+
+            // Save Project
+            $("#btnSave").click(function () {
+                $(this).prop("disabled", true);
+                var obj = {
+                    ProjectName: $("#ProjectName").val(),
+                    Description: $("#Description").val()
+                };
+                $.ajax({
+                    url: '/Project/Save',
+                    type: 'POST',
+                    data: obj,
+                    success: function (data) {
+                        load();
+                        $("#staticBackdrop").modal('hide');
+                        clearAll();
+                        $("#btnSave").prop("disabled", false);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error saving project:', error);
+                        $("#btnSave").prop("disabled", false);
+                    }
+                });
+            });
+
+            // Update Project
+            $("#btnUpdate").click(function () {
+                $(this).prop("disabled", true);
+                var obj = {
+                    ProjectId: $("#ProjectId").val(),
+                    ProjectName: $("#ProjectName").val(),
+                    Description: $("#Description").val()
+                };
+                $.ajax({
+                    url: '/Project/Update',
+                    type: 'POST',
+                    data: obj,
+                    success: function (data) {
+                        load();
+                        $("#staticBackdrop").modal('hide');
+                        clearAll();
+                        $("#btnUpdate").prop("disabled", false);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error updating project:', error);
+                        $("#btnUpdate").prop("disabled", false);
+                    }
+                });
+            });
+        });
+
+        // Load Projects
+        function load() {
+            $.ajax({
+                url: '/Project/Get',
+                type: 'GET',
+                success: function (data) {
+                    $('#tbl tbody').empty();
+                    var tr = "";
+                    $.each(data, function (index, item) {
+                        tr += "<tr>";
+                        tr += "<td>" + item.projectId + "</td>";
+                        tr += "<td>" + item.projectName + "</td>";
+                        tr += "<td>" + item.description + "</td>";
+                        tr += "<td><button class='btn btn-warning' onclick='edit(" + item.projectId + ")'><i class='fa fa-pencil'></i></button> | ";
+                        tr += "<button class='btn btn-danger' onclick='deleteProject(" + item.projectId + ")'><i class='fa fa-trash'></i></button></td>";
+                        tr += "</tr>";
+                    });
+                    $('#tbl tbody').html(tr);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error loading projects:', error);
+                }
+            });
+        }
+
+        // Edit Project
+        function edit(id) {
+            $.ajax({
+                url: '/Project/GetById/' + id,
+                type: 'GET',
+                success: function (data) {
+                    $("#ProjectId").val(data.projectId);
+                    $("#ProjectName").val(data.projectName);
+                    $("#Description").val(data.description);
+                    $("#staticBackdrop").modal('show');
+                    $("#btnSave").hide();
+                    $("#btnUpdate").show();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching project:', error);
+                }
+            });
+        }
+
+        // Delete Project
+        function deleteProject(id) {
+            $.ajax({
+                url: '/Project/Delete/' + id,
+                type: 'POST',
+                success: function (data) {
+                    load();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error deleting project:', error);
+                }
+            });
+        }
+
+        // Clear Form
+        function clearAll() {
+            $("#ProjectId").val("");
+            $("#ProjectName").val("");
+            $("#Description").val("");
+            $("#btnSave").show();
+            $("#btnUpdate").hide();
+        }
+    </script>
+}
