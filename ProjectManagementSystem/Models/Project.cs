@@ -10,5 +10,6 @@ namespace ProjectMannagementSystem.Models
         public string ProjectName { get; set; }
         public string Description { get; set; }
 
+        public virtual ICollection<AssignedProject> AssignedProjects { get; set; } = new List<AssignedProject>();
     }
 }

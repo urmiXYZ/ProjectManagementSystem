@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProjectMannagementSystem.Models;
 
 namespace ProjectMannagementSystem.Controllers
 {
+    [Authorize]
     public class ProjectController : Controller
     {
         private readonly ProjectDbContext _dbContext;
@@ -15,6 +17,12 @@ namespace ProjectMannagementSystem.Controllers
         {
             var tasks = _dbContext.Projects.ToList();
             return View(tasks);
+        }
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var projects = _dbContext.Projects.ToList();
+            return Json(projects);
         }
         public IActionResult Create()
         {
@@ -35,12 +43,6 @@ namespace ProjectMannagementSystem.Controllers
             return View(project);
         }
 
-        [HttpGet]
-        public IActionResult Get()
-        {
-            var projects = _dbContext.Projects.ToList();
-            return Json(projects);
-        }
 
         [HttpGet]
         public IActionResult GetById(int id)

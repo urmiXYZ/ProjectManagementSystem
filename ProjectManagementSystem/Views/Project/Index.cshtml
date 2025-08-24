@@ -4,12 +4,13 @@
     ViewData["Title"] = "Project List";
 }
 
-<!-- Add New Button -->
-<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-    Add New <i class="fa fa-plus" aria-hidden="true"></i>
-</button>
+<div class="mb-3 d-flex gap-2">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+        Add New <i class="fa fa-plus" aria-hidden="true"></i>
+    </button>
+    <a href="/AssignProject/Index" class="btn btn-secondary">Assigned Projects</a>
+</div>
 
-<!-- Project Table -->
 <table id="tbl" class="table table-bordered">
     <thead>
         <tr>
@@ -22,7 +23,6 @@
     <tbody></tbody>
 </table>
 
-<!-- Modal -->
 <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -59,7 +59,6 @@
             $("#btnUpdate").hide();
             load();
 
-            // Save Project
             $("#btnSave").click(function () {
                 $(this).prop("disabled", true);
                 var obj = {
@@ -83,7 +82,6 @@
                 });
             });
 
-            // Update Project
             $("#btnUpdate").click(function () {
                 $(this).prop("disabled", true);
                 var obj = {
@@ -109,10 +107,9 @@
             });
         });
 
-        // Load Projects
         function load() {
             $.ajax({
-                url: '/Project/Get',
+                url: '/Project/GetAll',
                 type: 'GET',
                 success: function (data) {
                     $('#tbl tbody').empty();
@@ -134,7 +131,6 @@
             });
         }
 
-        // Edit Project
         function edit(id) {
             $.ajax({
                 url: '/Project/GetById/' + id,
@@ -153,7 +149,6 @@
             });
         }
 
-        // Delete Project
         function deleteProject(id) {
             $.ajax({
                 url: '/Project/Delete/' + id,
@@ -167,7 +162,6 @@
             });
         }
 
-        // Clear Form
         function clearAll() {
             $("#ProjectId").val("");
             $("#ProjectName").val("");

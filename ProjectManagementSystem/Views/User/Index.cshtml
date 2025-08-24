@@ -1,0 +1,274 @@
+﻿@model IEnumerable<ProjectMannagementSystem.Models.User>
+
+@{
+    ViewData["Title"] = "User List";
+}
+
+<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#userModal">
+    Add New <i class="fa fa-plus"></i>
+</button>
+
+<table id="userTbl" class="table table-bordered">
+    <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Assigned Projects</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="userModalLabel">Add User</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="id" />
+                <div class="mb-3">
+                    <label for="UserName" class="form-label">Name:</label>
+                    <input type="text" id="UserName" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="Age" class="form-label">Age:</label>
+                    <input type="number" id="Age" class="form-control" min="18" max="70" />
+                </div>
+                <div class="mb-3">
+                    <label for="Email" class="form-label">Email:</label>
+                    <input type="email" id="Email" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="PhoneNumber" class="form-label">Phone:</label>
+                    <input type="text" id="PhoneNumber" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="JoinedAt" class="form-label">Joined At:</label>
+                    <input type="date" id="JoinedAt" class="form-control" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnUserSave">Save</button>
+                <button type="button" class="btn btn-success" id="btnUserUpdate">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="assignModalLabel">Assign Project</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="AssignUserId" />
+                <div class="mb-3">
+                    <label for="AssignProjectId" class="form-label">Select Projects:</label>
+                    <select id="AssignProjectId" class="form-select" multiple>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="AssignDueDate" class="form-label">Due Date:</label>
+                    <input type="date" id="AssignDueDate" class="form-control" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnAssignSave">Assign</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="profileModalLabel">User Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="profileBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#btnUserSave").show();
+            $("#btnUserUpdate").hide();
+            loadUsers();
+
+            $("#btnUserSave").click(function () {
+                $(this).prop("disabled", true);
+                var obj = {
+                    UserName: $("#UserName").val(),
+                    Age: $("#Age").val(),
+                    Email: $("#Email").val(),
+                    PhoneNumber: $("#PhoneNumber").val(),
+                    JoinedAt: $("#JoinedAt").val()
+                };
+                $.post('/User/Save', obj, function () {
+                    loadUsers();
+                    $("#userModal").modal('hide');
+                    clearUserForm();
+                    $("#btnUserSave").prop("disabled", false);
+                });
+            });
+
+            $("#btnUserUpdate").click(function () {
+                $(this).prop("disabled", true);
+                       var obj = {
+            Id: parseInt($("#id").val()),
+            UserName: $("#UserName").val(),
+            Age: parseInt($("#Age").val()),
+            Email: $("#Email").val(),
+            PhoneNumber: $("#PhoneNumber").val(),
+            JoinedAt: $("#JoinedAt").val()
+        };
+
+                $.post('/User/Update', obj, function () {
+                    loadUsers();
+                    $("#userModal").modal('hide');
+                    clearUserForm();
+                    $("#btnUserUpdate").prop("disabled", false);
+                });
+            });
+        });
+
+                function loadUsers() {
+            $.get('/User/Get', function (data) {
+                $('#userTbl tbody').empty();
+                $.each(data, function (i, user) {
+
+                    var assignedProjects = user.assignedProjects
+                        ? user.assignedProjects.map(p => p.projectName).join(', ')
+                        : '';
+
+                    var row = `<tr>
+                        <td>${user.id}</td>
+                        <td>${user.userName}</td>
+                        <td>${user.email}</td>
+                        <td>${assignedProjects}</td>
+                        <td>
+                            <button class='btn btn-primary btn-sm' onclick='showProfile(${user.id})'>Profile</button> |
+                            <button class='btn btn-warning btn-sm' onclick='editUser(${user.id})'><i class='fa fa-pencil'></i></button> |
+                            <button class='btn btn-danger btn-sm' onclick='deleteUser(${user.id})'><i class='fa fa-trash'></i></button> |
+                            <button class='btn btn-info btn-sm' onclick='openAssignModal(${user.id})'>Assign Project</button>
+                        </td>
+                    </tr>`;
+                    $('#userTbl tbody').append(row);
+                });
+            });
+        }
+
+        function editUser(id) {
+            $.get('/User/GetById/' + id, function (user) {
+                $("#id").val(user.id);
+                $("#UserName").val(user.userName);
+                $("#Age").val(user.age);
+                $("#Email").val(user.email);
+                $("#PhoneNumber").val(user.phoneNumber);
+                $("#JoinedAt").val(user.joinedAt.split('T')[0]);
+                $("#userModal").modal('show');
+                $("#btnUserSave").hide();
+                $("#btnUserUpdate").show();
+            });
+        }
+
+        function deleteUser(id) {
+            $.post('/User/Delete/' + id, function () {
+                loadUsers();
+            });
+        }
+
+        function clearUserForm() {
+            $("#id").val("");
+            $("#UserName").val("");
+            $("#Age").val("");
+            $("#Email").val("");
+            $("#Phone").val("");
+            $("#JoinedAt").val("");
+            $("#btnUserSave").show();
+            $("#btnUserUpdate").hide();
+        }
+
+            function openAssignModal(id) {
+            $("#AssignUserId").val(id);
+
+            $.get('/Project/GetAll', function (projects) {
+            $("#AssignProjectId").empty();
+            $.each(projects, function (i, project) {
+                $("#AssignProjectId").append(`<option value="${project.projectId}">${project.projectName}</option>`);
+            });
+            $("#assignModal").modal('show');
+        });
+
+        }
+
+                  $("#btnAssignSave").click(function () {
+            var userId = parseInt($("#AssignUserId").val()); 
+            var projectIds = $("#AssignProjectId").val(); 
+            var dueDate = $("#AssignDueDate").val();
+
+            if (!projectIds || projectIds.length === 0) {
+                alert("Please select at least one project.");
+                return;
+            }
+
+            var assignments = projectIds.map(function(projectId) {
+                return {
+                    UserId: userId,        
+                    ProjectId: parseInt(projectId),
+                    DueDate: dueDate
+                };
+            });
+
+            $.ajax({
+                url: '/AssignProject/Assign',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(assignments),
+                success: function () {
+                    $("#assignModal").modal('hide');
+                    loadUsers();
+                    loadAssignedProjects();
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                    alert("Failed to assign projects. Check console for details.");
+                }
+            });
+        });
+
+
+                function showProfile(id) {
+            $.get('/User/GetById/' + id, function(user) {
+                var html = `
+                    <p><strong>ID:</strong> ${user.id}</p>
+                    <p><strong>Name:</strong> ${user.userName}</p>
+                    <p><strong>Age:</strong> ${user.age}</p>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Phone:</strong> ${user.phoneNumber}</p>
+                    <p><strong>Joined At:</strong> ${user.joinedAt.split('T')[0]}</p>
+                    <p><strong>Assigned Projects:</strong> ${user.assignedProjects.map(p => p.projectName).join(', ')}</p>
+                `;
+                $("#profileBody").html(html);
+                $("#profileModal").modal('show');
+            });
+        }
+
+
+
+    </script>
+}

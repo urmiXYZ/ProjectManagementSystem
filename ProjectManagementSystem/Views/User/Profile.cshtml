@@ -1,0 +1,110 @@
+﻿@model ProjectMannagementSystem.Models.User
+@using Microsoft.AspNetCore.Identity
+
+<div class="card p-3">
+    <h4>My Profile</h4>
+    <div id="profileInfo"></div>
+    <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+        Edit Profile
+    </button>
+</div>
+
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProfileForm">
+                    <input type="hidden" id="editUserId" />
+
+                    <div class="mb-2">
+                        <label class="form-label"><b>User Name</b></label>
+                        <input type="text" class="form-control" id="editUserName" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label"><b>Email</b></label>
+                        <input type="email" class="form-control" id="editEmail" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label"><b>Phone</b></label>
+                        <input type="text" class="form-control" id="editPhoneNumber" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label"><b>Age</b></label>
+                        <input type="number" class="form-control" id="editAge" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label"><b>Joined</b></label>
+                        <input type="date" class="form-control" id="editJoinedAt" disabled />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="btnSaveProfile">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var userId = '@ViewBag.UserId';
+        $.get('/User/GetById?id=' + userId, function (data) {
+            $("#profileInfo").html(`
+                <p><b>User Name:</b> ${data.userName}</p>
+                <p><b>Email:</b> ${data.email}</p>
+                <p><b>Phone:</b> ${data.phoneNumber ?? ''}</p>
+                <p><b>Age:</b> ${data.age}</p>
+                <p><b>Joined:</b> ${data.joinedAt.split('T')[0]}</p>
+            `);
+
+            $("#editUserId").val(data.id);
+            $("#editUserName").val(data.userName);
+            $("#editEmail").val(data.email);
+            $("#editPhoneNumber").val(data.phoneNumber ?? '');
+            $("#editAge").val(data.age);
+            $("#editJoinedAt").val(data.joinedAt.split('T')[0]);
+        });
+
+
+        $("#btnSaveProfile").click(function () {
+            var profileData = {
+    Id: parseInt($("#editUserId").val()),
+                UserName: $("#editUserName").val(),
+                Email: $("#editEmail").val(),
+                PhoneNumber: $("#editPhoneNumber").val(),
+                Age: $("#editAge").val(),
+                JoinedAt: $("#editJoinedAt").val()
+            };
+
+            $.ajax({
+                url: '/User/Update',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(profileData),
+                success: function (res) {
+                    $("#profileInfo").html(`
+                        <p><b>User Name:</b> ${profileData.UserName}</p>
+                        <p><b>Email:</b> ${profileData.Email}</p>
+                        <p><b>Phone:</b> ${profileData.PhoneNumber ?? ''}</p>
+                        <p><b>Age:</b> ${profileData.Age}</p>
+                        <p><b>Joined:</b> ${profileData.JoinedAt.split('T')[0]}</p>
+                    `);
+                    $("#editProfileModal").modal('hide');
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+
