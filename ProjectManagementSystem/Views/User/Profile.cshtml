@@ -3,11 +3,14 @@
 
 <div class="card p-3">
     <h4>My Profile</h4>
-    <div id="profileInfo"></div>
+    <img id="profileImage" src="/images/default-avatar.png" style="width:100px; height:100px; border-radius:8px; margin-bottom:10px;" />
+    <div id="profileDetails"></div>
     <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
         Edit Profile
     </button>
 </div>
+
+
 
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -19,6 +22,18 @@
             <div class="modal-body">
                 <form id="editProfileForm">
                     <input type="hidden" id="editUserId" />
+                    <div class="mb-2">
+                        <label class="form-label"><b>Profile Picture</b></label>
+                        <input type="file" class="form-control" id="editProfilePicture" accept=".jpg,.jpeg,.png" style="display:none;" />
+                        <img id="profilePreview" src="" style="width:80px; height:80px; margin-top:5px;" />
+                       
+                        <button type="button" class="btn btn-primary" id="btnSelectPicture">Update Picture</button>
+                    </div>
+                    <hr />
+                    <div class="mb-2">
+                        <label class="form-label"><b>Full Name</b></label>
+                        <input type="text" class="form-control" id="editFullName" />
+                    </div>
 
                     <div class="mb-2">
                         <label class="form-label"><b>User Name</b></label>
@@ -44,6 +59,10 @@
                         <label class="form-label"><b>Joined</b></label>
                         <input type="date" class="form-control" id="editJoinedAt" disabled />
                     </div>
+
+                    
+
+                    
                 </form>
             </div>
             <div class="modal-footer">
@@ -55,56 +74,114 @@
 </div>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
-    $(document).ready(function () {
+       $(document).ready(function () {
         var userId = '@ViewBag.UserId';
-        $.get('/User/GetById?id=' + userId, function (data) {
-            $("#profileInfo").html(`
-                <p><b>User Name:</b> ${data.userName}</p>
-                <p><b>Email:</b> ${data.email}</p>
-                <p><b>Phone:</b> ${data.phoneNumber ?? ''}</p>
-                <p><b>Age:</b> ${data.age}</p>
-                <p><b>Joined:</b> ${data.joinedAt.split('T')[0]}</p>
-            `);
 
-            $("#editUserId").val(data.id);
-            $("#editUserName").val(data.userName);
-            $("#editEmail").val(data.email);
-            $("#editPhoneNumber").val(data.phoneNumber ?? '');
-            $("#editAge").val(data.age);
-            $("#editJoinedAt").val(data.joinedAt.split('T')[0]);
+        function loadProfile() {
+            $.get('/User/GetById?id=' + userId, function (data) {
+              var pictureUrl = data.picturePath ? data.picturePath : "/images/default-avatar.png";
+
+            $.get('/User/GetById?id=' + userId, function (data) {
+        var pictureUrl = data.picturePath ? data.picturePath : "/images/default-avatar.png";
+        $("#profileImage").attr("src", pictureUrl); 
+
+        $("#profileDetails").html(`
+            <p><b>Full Name:</b> ${data.fullName}</p>
+            <p><b>User Name:</b> ${data.userName}</p>
+            <p><b>Email:</b> ${data.email}</p>
+            <p><b>Phone:</b> ${data.phoneNumber ?? ''}</p>
+            <p><b>Age:</b> ${data.age}</p>
+            <p><b>Joined:</b> ${data.joinedAt.split('T')[0]}</p>
+        `);
+    });
+
+
+                $("#editUserId").val(data.id);
+                $("#editFullName").val(data.fullName);
+                $("#editUserName").val(data.userName);
+                $("#editEmail").val(data.email);
+                $("#editPhoneNumber").val(data.phoneNumber ?? '');
+                $("#editAge").val(data.age);
+                $("#editJoinedAt").val(data.joinedAt.split('T')[0]);
+                if(data.picturePath) $("#profilePreview").attr("src", data.picturePath);
+
+                const firstName = data.fullName.split(' ')[0];
+                $("#navFirstName").html(`<em>Hello, ${firstName}!</em>`);
+            });
+        }
+
+        loadProfile();
+
+           $(document).ready(function () {
+
+        $("#btnSelectPicture").click(function() {
+            $("#editProfilePicture").click();
         });
 
+        $("#editProfilePicture").on("change", function() {
+            const file = this.files[0];
+            if (file) {
+                $("#profilePreview").attr("src", URL.createObjectURL(file));
+            }
+        });
 
         $("#btnSaveProfile").click(function () {
-            var profileData = {
-    Id: parseInt($("#editUserId").val()),
-                UserName: $("#editUserName").val(),
-                Email: $("#editEmail").val(),
-                PhoneNumber: $("#editPhoneNumber").val(),
-                Age: $("#editAge").val(),
-                JoinedAt: $("#editJoinedAt").val()
-            };
+            var formData = new FormData();
+
+            formData.append("Id", $("#editUserId").val());
+            formData.append("FullName", $("#editFullName").val());
+            formData.append("UserName", $("#editUserName").val());
+            formData.append("Email", $("#editEmail").val());
+            formData.append("PhoneNumber", $("#editPhoneNumber").val());
+            formData.append("Age", $("#editAge").val());
+            formData.append("JoinedAt", $("#editJoinedAt").val());
+
+            var pictureFile = $("#editProfilePicture")[0].files[0];
+            if (pictureFile) {
+                formData.append("Picture", pictureFile);
+            }
 
             $.ajax({
-                url: '/User/Update',
+                url: '/User/UpdateProfileWithPicture', 
                 type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(profileData),
-                success: function (res) {
-                    $("#profileInfo").html(`
-                        <p><b>User Name:</b> ${profileData.UserName}</p>
-                        <p><b>Email:</b> ${profileData.Email}</p>
-                        <p><b>Phone:</b> ${profileData.PhoneNumber ?? ''}</p>
-                        <p><b>Age:</b> ${profileData.Age}</p>
-                        <p><b>Joined:</b> ${profileData.JoinedAt.split('T')[0]}</p>
-                    `);
-                    $("#editProfileModal").modal('hide');
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    if (data.success) {
+                        $("#profilePreview").attr("src", data.picturePath || $("#profilePreview").attr("src"));
+                        const newSrc = data.picturePath + "?t=" + new Date().getTime();
+                        $("#profileImage").attr("src", newSrc);
+
+        $("#navProfileImage").attr("src", newSrc);
+
+        $("#profilePreview").attr("src", newSrc);
+                        $("#profileInfo").html(`
+                            <p><b>Full Name:</b> ${data.fullName}</p>
+                            <p><b>User Name:</b> ${data.userName}</p>
+                            <p><b>Email:</b> ${data.email}</p>
+                            <p><b>Phone:</b> ${data.phoneNumber ?? ''}</p>
+                            <p><b>Age:</b> ${data.age}</p>
+                            <p><b>Joined:</b> ${data.joinedAt.split('T')[0]}</p>
+                        `);
+
+                        const firstName = data.fullName.split(' ')[0];
+                        $("#navFirstName").html(`<em>Hello, ${firstName}!</em>`);
+
+                        $("#editProfileModal").modal('hide');
+                    } else {
+                        alert("Update failed: " + data.msg);
+                    }
                 },
-                error: function (xhr) {
+                error: function(xhr) {
                     console.error(xhr.responseText);
                 }
             });
         });
     });
+
+
+    });
+
 </script>
 

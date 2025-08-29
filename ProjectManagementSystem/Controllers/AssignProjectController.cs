@@ -17,6 +17,8 @@ namespace ProjectMannagementSystem.Controllers
             _context = context;
             _userManager = userManager;
         }
+        [Authorize]
+
 
         public IActionResult Index()
         {
@@ -24,6 +26,8 @@ namespace ProjectMannagementSystem.Controllers
         }
 
         [HttpGet]
+        [Authorize]
+
         public async Task<IActionResult> GetAll()
         {
             var currentUser = await _userManager.GetUserAsync(User);
@@ -56,6 +60,7 @@ namespace ProjectMannagementSystem.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         public IActionResult Assign([FromBody] List<AssignedProject> models)
         {
             foreach (var model in models)
@@ -73,6 +78,7 @@ namespace ProjectMannagementSystem.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         public IActionResult ChangeDueDateStatus([FromBody] AssignedProject model)
         {
             if (model == null) return BadRequest("Invalid data");
@@ -91,41 +97,46 @@ namespace ProjectMannagementSystem.Controllers
             return Ok();
         }
 
+
         [HttpPost]
         [Authorize(Roles = "Employee")]
-        public IActionResult UpdateSubmitDate([FromBody] AssignedProject model)
+        public IActionResult SubmitTask([FromForm] int assignId)
         {
-            if (model == null) return BadRequest("Invalid data");
-
-            var assignment = _context.AssignedProjects
-                .FirstOrDefault(ap => ap.AssignedId == model.AssignedId);
-
-            if (assignment == null) return NotFound();
-
-            var currentUserId = int.Parse(_userManager.GetUserId(User));
-            if (assignment.UserId != currentUserId)
-                return Forbid();
-
-            assignment.SubmitDate = model.SubmitDate ?? DateTime.Now;
-
-            _context.SaveChanges();
-            return Ok();
-        }
-        [HttpPost]
-        public IActionResult SubmitTask([FromBody] dynamic data)
-        {
-            int assignedId = data.assignedId;
-            var assignment = _context.AssignedProjects.Find(assignedId);
+            var assignment = _context.AssignedProjects.Find(assignId);
 
             if (assignment == null)
                 return NotFound(new { msg = "Task not found" });
-
+            if (assignment.Status == ProjectStatus.OnHold ||
+        assignment.Status == ProjectStatus.Cancelled)
+            {
+                return BadRequest(new { msg = $"Cannot submit task. Status is {assignment.Status}." });
+            }
             assignment.SubmitDate = DateTime.Now;
+            assignment.Status = ProjectStatus.Completed;
+
             _context.SaveChanges();
 
             return Ok(new { msg = "Task submitted successfully" });
         }
 
+        [HttpPost]
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        public IActionResult ResubmitTask([FromForm] int assignId, [FromForm] DateTime dueDate)
+        {
+            var assignment = _context.AssignedProjects.Find(assignId);
+            if (assignment == null)
+                return NotFound(new { msg = "Task not found" });
+
+            if (assignment.Status != ProjectStatus.Completed)
+                return BadRequest(new { msg = "Only completed tasks can be resubmitted" });
+
+            assignment.DueDate = dueDate;
+            assignment.Status = ProjectStatus.InProgress;
+            assignment.SubmitDate = null;
+
+            _context.SaveChanges();
+            return Ok(new { msg = "Task resubmitted successfully" });
+        }
 
 
 

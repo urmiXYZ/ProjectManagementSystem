@@ -9,7 +9,15 @@
         Add New <i class="fa fa-plus" aria-hidden="true"></i>
     </button>
     <a href="/AssignProject/Index" class="btn btn-secondary">Assigned Projects</a>
+    <button id="exportProjects" class="btn btn-success d-flex align-items-center justify-content-center">
+        <i class="fa fa-file-excel me-2"></i> Export Projects
+    </button>
 </div>
+<div class="input-group mb-3">
+    <span class="input-group-text"><i class="fa fa-search"></i></span>
+    <input type="text" id="searchProject" class="form-control" placeholder="Search by project name...">
+</div>
+
 
 <table id="tbl" class="table table-bordered">
     <thead>
@@ -59,6 +67,11 @@
             $("#btnUpdate").hide();
             load();
 
+                    $("#exportProjects").click(function () {
+            exportTableToCSV('projects.csv', '#tbl'); 
+        });
+
+
             $("#btnSave").click(function () {
                 $(this).prop("disabled", true);
                 var obj = {
@@ -107,7 +120,7 @@
             });
         });
 
-        function load() {
+               function load() {
             $.ajax({
                 url: '/Project/GetAll',
                 type: 'GET',
@@ -124,11 +137,39 @@
                         tr += "</tr>";
                     });
                     $('#tbl tbody').html(tr);
+
+                    $("#searchProject").off("keyup").on("keyup", function () {
+                        var value = $(this).val().toLowerCase().trim();
+                        $("#tbl tbody tr").filter(function () {
+                            $(this).toggle($(this).find("td:eq(1)").text().toLowerCase().indexOf(value) > -1);
+                        });
+                    });
                 },
                 error: function (xhr, status, error) {
                     console.error('Error loading projects:', error);
                 }
             });
+        }
+                function exportTableToCSV(filename = 'table.csv', tableSelector = '#tbl') {
+            var csv = [];
+            var rows = document.querySelectorAll(tableSelector + " tr");
+
+            for (var i = 0; i < rows.length; i++) {
+                var row = [], cols = rows[i].querySelectorAll("td, th");
+                for (var j = 0; j < cols.length - 1; j++) { 
+                    row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+                }
+                csv.push(row.join(","));
+            }
+
+            var csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+            var downloadLink = document.createElement("a");
+            downloadLink.download = filename;
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
         }
 
         function edit(id) {

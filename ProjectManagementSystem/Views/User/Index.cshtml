@@ -1,25 +1,68 @@
 ﻿@model IEnumerable<ProjectMannagementSystem.Models.User>
-
+@inject UserManager<User> UserManager
+@inject SignInManager<User> SignInManager
 @{
     ViewData["Title"] = "User List";
 }
 
-<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#userModal">
-    Add New <i class="fa fa-plus"></i>
-</button>
+<div class="mb-3 d-flex gap-2 align-items-stretch">
+    <button type="button" class="btn btn-primary d-flex align-items-center justify-content-center" onclick="openAddUserModal()">
+        Add New <i class="fa fa-plus ms-2"></i>
+    </button>
+    <button type="button" class="btn btn-warning d-flex align-items-center justify-content-center" onclick="openAssignRoleModal()">
+        Assign Role <i class="fa fa-user-shield ms-2"></i>
+    </button>
+    <button id="exportUsers" class="btn btn-success d-flex align-items-center justify-content-center">
+        <i class="fa fa-file-excel me-2"></i> Export Users
+    </button>
+</div>
+
+<div class="input-group mb-3">
+    <span class="input-group-text"><i class="fa fa-search"></i></span>
+    <input type="text" id="searchUser" class="form-control" placeholder="Search by name...">
+</div>
+
 
 <table id="userTbl" class="table table-bordered">
     <thead>
         <tr>
             <th>User ID</th>
-            <th>Name</th>
+            <th>Full Name</th>
+            <th>Username</th>
             <th>Email</th>
+            <th>Role</th> 
             <th>Assigned Projects</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody></tbody>
 </table>
+
+<div class="modal fade" id="assignRoleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Assign Role to Users</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label>Select Users:</label>
+                <select id="assignRoleUsers" class="form-select" multiple></select>
+
+                <label class="mt-3">Select Role:</label>
+                <select id="assignRoleSelect" class="form-select">
+                    <option value="Admin">Admin</option>
+                    <option value="Employee" selected>Employee</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning" onclick="assignRole()">Assign Role</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -31,7 +74,11 @@
             <div class="modal-body">
                 <input type="hidden" id="id" />
                 <div class="mb-3">
-                    <label for="UserName" class="form-label">Name:</label>
+                    <label for="FullName" class="form-label">Full Name:</label>
+                    <input type="text" id="FullName" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="UserName" class="form-label">Username:</label>
                     <input type="text" id="UserName" class="form-control" />
                 </div>
                 <div class="mb-3">
@@ -104,14 +151,30 @@
 
 @section Scripts {
     <script>
+        var currentUserRole = "@(User.IsInRole("SuperAdmin") ? "SuperAdmin" : User.IsInRole("Admin") ? "Admin" : "Employee")";
+
         $(document).ready(function () {
-            $("#btnUserSave").show();
-            $("#btnUserUpdate").hide();
-            loadUsers();
+               
+        loadUsers();
+
+
+             $("#searchUser").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#userTbl tbody tr").filter(function () {
+                $(this).toggle(
+                    $(this).find("td:eq(1)").text().toLowerCase().indexOf(value) > -1 ||   // Full Name column
+                    $(this).find("td:eq(2)").text().toLowerCase().indexOf(value) > -1     // Username column
+                );
+            });
+        });
+             $("#exportUsers").click(function () {
+            exportTableToCSV('users.csv', '#userTbl');
+        });
 
             $("#btnUserSave").click(function () {
                 $(this).prop("disabled", true);
                 var obj = {
+                    FullName: $("#FullName").val(),
                     UserName: $("#UserName").val(),
                     Age: $("#Age").val(),
                     Email: $("#Email").val(),
@@ -126,65 +189,124 @@
                 });
             });
 
-            $("#btnUserUpdate").click(function () {
-                $(this).prop("disabled", true);
-                       var obj = {
-            Id: parseInt($("#id").val()),
-            UserName: $("#UserName").val(),
-            Age: parseInt($("#Age").val()),
-            Email: $("#Email").val(),
-            PhoneNumber: $("#PhoneNumber").val(),
-            JoinedAt: $("#JoinedAt").val()
-        };
+                    $("#btnUserUpdate").click(function () {
+            $(this).prop("disabled", true);
 
-                $.post('/User/Update', obj, function () {
+            var obj = {
+                Id: parseInt($("#id").val()),
+                FullName: $("#FullName").val(),
+                UserName: $("#UserName").val(),
+                Age: parseInt($("#Age").val()),
+                Email: $("#Email").val(),
+                PhoneNumber: $("#PhoneNumber").val(),
+                JoinedAt: $("#JoinedAt").val()
+            };
+
+            $.ajax({
+                url: '/User/Update',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(obj),
+                success: function () {
                     loadUsers();
-                    $("#userModal").modal('hide');
+                    var userModal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
+                    userModal.hide();
                     clearUserForm();
                     $("#btnUserUpdate").prop("disabled", false);
-                });
+                },
+                error: function(xhr) {
+                    console.error(xhr.responseText);
+                    $("#btnUserUpdate").prop("disabled", false);
+                }
             });
         });
+         });
 
-                function loadUsers() {
+                                       function loadUsers() {
             $.get('/User/Get', function (data) {
                 $('#userTbl tbody').empty();
                 $.each(data, function (i, user) {
-
                     var assignedProjects = user.assignedProjects
                         ? user.assignedProjects.map(p => p.projectName).join(', ')
                         : '';
 
+                    let actions = `<button class='btn btn-primary btn-sm' onclick='showProfile(${user.id})'>Profile</button>`;
+
+                    if (user.role !== "SuperAdmin") {
+                        if (user.role === "Admin" && currentUserRole === "SuperAdmin") {
+                            actions += ` |
+                                <button class='btn btn-warning btn-sm' onclick='editUser(${user.id})'><i class='fa fa-pencil'></i></button> |
+                                <button class='btn btn-danger btn-sm' onclick='deleteUser(${user.id})'><i class='fa fa-trash'></i></button>`;
+                        }
+                        else if (user.role === "Employee") {
+                            actions += ` |
+                                <button class='btn btn-warning btn-sm' onclick='editUser(${user.id})'><i class='fa fa-pencil'></i></button> |
+                                <button class='btn btn-danger btn-sm' onclick='deleteUser(${user.id})'><i class='fa fa-trash'></i></button> |
+                                <button class='btn btn-info btn-sm' onclick='openAssignModal(${user.id})'>Assign Project</button>`;
+                        }
+                    }
+
                     var row = `<tr>
                         <td>${user.id}</td>
+                        <td>${user.fullName}</td>
                         <td>${user.userName}</td>
                         <td>${user.email}</td>
+                        <td>${user.role}</td>
                         <td>${assignedProjects}</td>
-                        <td>
-                            <button class='btn btn-primary btn-sm' onclick='showProfile(${user.id})'>Profile</button> |
-                            <button class='btn btn-warning btn-sm' onclick='editUser(${user.id})'><i class='fa fa-pencil'></i></button> |
-                            <button class='btn btn-danger btn-sm' onclick='deleteUser(${user.id})'><i class='fa fa-trash'></i></button> |
-                            <button class='btn btn-info btn-sm' onclick='openAssignModal(${user.id})'>Assign Project</button>
-                        </td>
+                        <td>${actions}</td>
                     </tr>`;
+
                     $('#userTbl tbody').append(row);
                 });
             });
         }
 
-        function editUser(id) {
+
+
+                function exportTableToCSV(filename = 'table.csv', tableSelector = '#userTbl') {
+            var csv = [];
+            var rows = document.querySelectorAll(tableSelector + " tr");
+
+            for (var i = 0; i < rows.length; i++) {
+                var row = [], cols = rows[i].querySelectorAll("td, th");
+                for (var j = 0; j < cols.length - 1; j++) { 
+                    row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+                }
+                csv.push(row.join(","));
+            }
+
+            var csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+            var downloadLink = document.createElement("a");
+            downloadLink.download = filename;
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+                       function editUser(id) {
             $.get('/User/GetById/' + id, function (user) {
+                if (!user) {
+                    alert("User not found");
+                    return;
+                }
+
                 $("#id").val(user.id);
-                $("#UserName").val(user.userName);
-                $("#Age").val(user.age);
-                $("#Email").val(user.email);
-                $("#PhoneNumber").val(user.phoneNumber);
-                $("#JoinedAt").val(user.joinedAt.split('T')[0]);
-                $("#userModal").modal('show');
+                $("#FullName").val(user.fullName || '');
+                $("#UserName").val(user.userName || '');
+                $("#Age").val(user.age || '');
+                $("#Email").val(user.email || '');
+                $("#PhoneNumber").val(user.phoneNumber || '');
+                $("#JoinedAt").val(user.joinedAt ? user.joinedAt.split('T')[0] : '');
+
                 $("#btnUserSave").hide();
                 $("#btnUserUpdate").show();
+
+                var userModal = new bootstrap.Modal(document.getElementById('userModal'));
+                userModal.show();
             });
         }
+
 
         function deleteUser(id) {
             $.post('/User/Delete/' + id, function () {
@@ -194,6 +316,7 @@
 
         function clearUserForm() {
             $("#id").val("");
+            $("#FullName").val("");
             $("#UserName").val("");
             $("#Age").val("");
             $("#Email").val("");
@@ -255,7 +378,11 @@
                 function showProfile(id) {
             $.get('/User/GetById/' + id, function(user) {
                 var html = `
+                <div style="text-align:center; margin-bottom:15px;">
+        <img src="${user.picturePath || '/Pictures/default.png'}" style="width:100px; height:100px; border-radius:50%;" />
+                    </div>
                     <p><strong>ID:</strong> ${user.id}</p>
+                    <p><strong>Name:</strong> ${user.fullName}</p>
                     <p><strong>Name:</strong> ${user.userName}</p>
                     <p><strong>Age:</strong> ${user.age}</p>
                     <p><strong>Email:</strong> ${user.email}</p>
@@ -268,6 +395,53 @@
             });
         }
 
+
+                function openAddUserModal() {
+            clearUserForm();
+            $("#btnUserSave").show();
+            $("#btnUserUpdate").hide();
+            var userModal = new bootstrap.Modal(document.getElementById('userModal'));
+            userModal.show();
+        }
+
+                function openAssignRoleModal() {
+            $.get('/User/Get', function(data) {
+                $("#assignRoleUsers").empty();
+                $.each(data, function(i, user) {
+                    $("#assignRoleUsers").append(
+                        `<option value="${user.id}">${user.fullName} (${user.userName}) - ${user.role}</option>`
+                    );
+                });
+            });
+
+            var modal = new bootstrap.Modal(document.getElementById('assignRoleModal'));
+            modal.show();
+        }
+
+        function assignRole() {
+            var selectedUsers = $("#assignRoleUsers").val(); 
+            var role = $("#assignRoleSelect").val();
+
+            if (!selectedUsers || selectedUsers.length === 0) {
+                alert("Please select at least one user.");
+                return;
+            }
+
+                          $.ajax({
+            url: '/User/AssignRole',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ userIds: selectedUsers.map(id => parseInt(id)), role: role }),
+            success: function(res) {
+                $('#assignRoleModal').modal('hide');
+                loadUsers();
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                alert("Server error: " + error);
+            }
+        });
+}
 
 
     </script>

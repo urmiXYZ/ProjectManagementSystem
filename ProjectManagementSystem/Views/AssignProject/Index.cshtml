@@ -2,7 +2,7 @@
     ViewData["Title"] = "Assigned Projects";
 }
 
-@if (User.IsInRole("Admin"))
+@if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
 {
     <div class="mb-3 d-flex gap-2">
         <button type="button" class="btn btn-primary" onclick="openAssignProjectModal()">
@@ -11,9 +11,17 @@
         <a href="/Project/Index" class="btn btn-secondary">
             All Projects <i class="fa fa-arrow-left"></i>
         </a>
+        <button id="exportAssigned" class="btn btn-success">
+            <i class="fa fa-file-excel"></i> Export Assigned Projects
+        </button>
+    </div>
+
+    <div class="input-group mb-3">
+        <span class="input-group-text"><i class="fa fa-search"></i></span>
+        <input type="text" id="searchAssigned" class="form-control" placeholder="Search by user or project name...">
     </div>
 }
-
+<h2>Assigned projects</h2>
 <table id="assignedProjectsTbl" class="table table-bordered">
     <thead>
         <tr>
@@ -75,9 +83,69 @@
     </div>
 </div>
 
+<div class="modal fade" id="resubmitModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Resubmit Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="resubmitAssignId">
+                <label for="newDueDate">New Due Date:</label>
+                <input type="date" id="newDueDate" class="form-control">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-info" onclick="resubmitTask()">Resubmit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     <script>
+                $(document).ready(function () {
+            loadAssignedProjects();
+
+            $("#searchAssigned").on("keyup", function () {
+                var value = $(this).val().toLowerCase().trim();
+                $("#assignedProjectsTbl tbody tr").filter(function () {
+                    var projectName = $(this).find("td:eq(1)").text().toLowerCase(); 
+                    var userName = $(this).find("td:eq(2)").text().toLowerCase();    
+                    $(this).toggle(projectName.indexOf(value) > -1 || userName.indexOf(value) > -1);
+                });
+            });
+        });
+
+                function exportTableToCSV(filename = 'assigned_projects.csv') {
+            var csv = [];
+            var rows = document.querySelectorAll("#assignedProjectsTbl tr");
+
+            for (var i = 0; i < rows.length; i++) {
+                var row = [], cols = rows[i].querySelectorAll("td, th");
+                for (var j = 0; j < cols.length - 1; j++) { 
+                    row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+                }
+                csv.push(row.join(","));
+            }
+
+            var csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+            var downloadLink = document.createElement("a");
+            downloadLink.download = filename;
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+
+        $("#exportAssigned").click(function () {
+            exportTableToCSV();
+        });
+
+
         function saveChangedDueDateStatus() {
             var assignedId = parseInt($("#AssignedId").val());
             var dueDate = $("#AssignDueDate").val();
@@ -179,16 +247,25 @@
 
         var isEmployee = '@User.IsInRole("Employee")' === 'True';
 
-        function loadAssignedProjects() {
+                        function loadAssignedProjects() {
             $.get('/AssignProject/GetAll', function(data) {
                 $('#assignedProjectsTbl tbody').empty();
 
                 $.each(data, function(i, ap) {
-                    var actionBtn = '';
-                    if(isEmployee) {
-                        actionBtn = ap.submitDate ? '' : `<button class="btn btn-success btn-sm submitTask" data-id="${ap.assignedId}">Submit</button>`;
+                    let actionBtn = '';
+
+                    if (isEmployee) {
+                        if (ap.status === "OnHold" || ap.status === "Cancelled" || ap.submitDate) {
+                            actionBtn = `<button class="btn btn-success btn-sm" disabled>Submit</button>`;
+                        } else {
+                            actionBtn = `<button class="btn btn-success btn-sm submitTask" data-id="${ap.assignedId}">Submit</button>`;
+                        }
                     } else {
                         actionBtn = `<button class="btn btn-warning btn-sm" onclick="openChangeDueDateModal(${ap.assignedId}, '${ap.dueDate.split('T')[0]}', '${ap.status}')">Change Due Date / Status</button>`;
+
+                        if (ap.status === "Completed") {
+                            actionBtn += ` <button class="btn btn-info btn-sm" onclick="openResubmitModal(${ap.assignedId}, '${ap.dueDate.split('T')[0]}')">Resubmit</button>`;
+                        }
                     }
 
                     var row = `<tr>
@@ -208,15 +285,23 @@
             });
         }
 
-        $(document).on('click', '.submitTask', function() {
-            var assignedId = $(this).data('id');
-            $.post('/AssignProject/SubmitTask', { assignedId: assignedId }, function(res) {
-                alert(res.msg);
-                loadAssignedProjects();
-            }).fail(function() {
-                alert('Error submitting task');
+
+
+               $(document).on('click', '.submitTask', function () {
+            var assignId = $(this).data('id');
+
+            $.ajax({
+                url: '/AssignProject/SubmitTask',
+                type: 'POST',
+                data: { assignId: assignId },
+                success: function (res) {
+                    loadAssignedProjects();
+                },
+                error: function () {
+                }
             });
         });
+
 
         function loadUsers() {
             $.get('/User/Get', function(data) {
@@ -236,6 +321,37 @@
                 $("#AssignProjectId").prepend('<option value="" selected disabled>Select Project</option>');
             });
         }
+
+                function openResubmitModal(assignId, currentDueDate) {
+            $("#resubmitAssignId").val(assignId);
+            $("#newDueDate").val(currentDueDate);
+            var modal = new bootstrap.Modal(document.getElementById('resubmitModal'));
+            modal.show();
+        }
+                function resubmitTask() {
+            var assignId = $("#resubmitAssignId").val();
+            var newDueDate = $("#newDueDate").val();
+
+            if (!newDueDate) {
+                alert("Please select a new due date.");
+                return;
+            }
+
+            $.ajax({
+                url: '/AssignProject/ResubmitTask',
+                type: 'POST',
+                data: { assignId: assignId, dueDate: newDueDate },
+                success: function(res) {
+                    alert(res.msg);
+                    $('#resubmitModal').modal('hide');
+                    loadAssignedProjects();
+                },
+                error: function(err) {
+                    alert(err.responseJSON?.msg || "Failed to resubmit task");
+                }
+            });
+        }
+
 
         $(document).ready(function() {
             loadAssignedProjects();

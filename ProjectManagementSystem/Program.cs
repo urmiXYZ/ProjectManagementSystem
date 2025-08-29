@@ -18,6 +18,7 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 6;
+    //options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
 })
 .AddEntityFrameworkStores<ProjectDbContext>()
 .AddDefaultTokenProviders();
@@ -27,6 +28,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/Account/Login"; 
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
+
 
 var app = builder.Build();
 

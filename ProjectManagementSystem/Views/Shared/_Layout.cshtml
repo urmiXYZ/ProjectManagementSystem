@@ -25,28 +25,50 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+
                         <ul class="navbar-nav">
-                            @if (User.IsInRole("Admin"))
+                            @if (User.IsInRole("Admin") )
+                            {
+                                <li class="nav-item"><a class="nav-link" href="/User/Index">Users</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/Project/Index">Projects</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/AssignProject/Index">Assigned Projects</a></li>
+                            }
+                            @if (User.IsInRole("SuperAdmin"))
                             {
                                 <li class="nav-item"><a class="nav-link" href="/Role/Index">Roles</a></li>
                                 <li class="nav-item"><a class="nav-link" href="/User/Index">Users</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/Task/Index">Tasks</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/Project/Index">Projects</a></li>
                                 <li class="nav-item"><a class="nav-link" href="/AssignProject/Index">Assigned Projects</a></li>
                             }
                             else if (User.IsInRole("Employee"))
                             {
-                                <li class="nav-item"><a class="nav-link" href="/AssignProject/Index">My Tasks</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/User/Profile">Profile</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/AssignProject/Index">My Projects</a></li>
                             }
                         </ul>
 
                     </ul>
 
+                    @inject UserManager<User> UserManager
+
                     <ul class="navbar-nav ms-auto">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-item">
-                                <span class="nav-link text-dark">Hello, @User.Identity.Name!</span>
+                            var currentUser = await UserManager.GetUserAsync(User);
+                            var firstName = currentUser?.FullName?.Split(' ')[0];
+                            var pictureUrl = string.IsNullOrEmpty(currentUser?.PicturePath)
+                            ? "/images/default-avatar.png"
+                            : currentUser.PicturePath;
+                            <li class="nav-item"><a class="nav-link" href="/User/Profile">Profile</a></li>
+
+                            <li class="nav-item d-flex align-items-center">
+                                <img id="navProfileImage"
+                                     src="@pictureUrl"
+                                     alt="Profile"
+                                     style="width:32px; height:32px; border-radius:50%; margin-right:8px;" />
+
+                                <span class="nav-link text-dark" style="font-style: italic; padding:0;">
+                                    Hello, @firstName!
+                                </span>
                             </li>
                             <li class="nav-item">
                                 <form class="d-inline" asp-area="" asp-controller="Account" asp-action="Logout" method="post">
@@ -61,6 +83,7 @@
                             </li>
                         }
                     </ul>
+
                    
 
                 </div>

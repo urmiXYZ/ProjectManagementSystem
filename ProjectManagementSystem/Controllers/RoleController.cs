@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ProjectMannagementSystem.Models;
 
 
 namespace ProjectMannagementSystem.Controllers
 {
+    [Authorize(Roles = "SuperAdmin")]
     public class RoleController : Controller
     {
         private readonly RoleManager<IdentityRole<int>> _roleManager;

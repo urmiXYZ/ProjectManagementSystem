@@ -4,7 +4,7 @@ using ProjectMannagementSystem.Models;
 
 namespace ProjectMannagementSystem.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,SuperAdmin")]
     public class ProjectController : Controller
     {
         private readonly ProjectDbContext _dbContext;
