@@ -1,17 +1,33 @@
 ﻿@model IEnumerable<ProjectMannagementSystem.Models.Project>
 
 @{
-    ViewData["Title"] = "Project List";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Projects</h1>
+            </div><!-- /.col -->
 
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
 <div class="mb-3 d-flex gap-2">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-        Add New <i class="fa fa-plus" aria-hidden="true"></i>
-    </button>
-    <a href="/AssignProject/Index" class="btn btn-secondary">Assigned Projects</a>
-    <button id="exportProjects" class="btn btn-success d-flex align-items-center justify-content-center">
-        <i class="fa fa-file-excel me-2"></i> Export Projects
-    </button>
+    <div class="d-flex align-items-center mt-4" style="gap: 10px; padding-left: 20px;">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+            Add New <i class="fa fa-plus" aria-hidden="true"></i>
+        </button>
+
+        <a href="/AssignProject/Index" class="btn btn-secondary">Assigned Projects</a>
+
+        <button id="exportProjects" class="btn btn-success d-flex align-items-center justify-content-center">
+            <i class="fa fa-file-excel me-2"></i> Export Projects
+        </button>
+    </div>
+
+
+
 </div>
 <div class="input-group mb-3">
     <span class="input-group-text"><i class="fa fa-search"></i></span>
@@ -132,8 +148,9 @@
                         tr += "<td>" + item.projectId + "</td>";
                         tr += "<td>" + item.projectName + "</td>";
                         tr += "<td>" + item.description + "</td>";
-                        tr += "<td><button class='btn btn-warning' onclick='edit(" + item.projectId + ")'><i class='fa fa-pencil'></i></button> | ";
-                        tr += "<button class='btn btn-danger' onclick='deleteProject(" + item.projectId + ")'><i class='fa fa-trash'></i></button></td>";
+                               tr += "<td><button class='btn btn-warning' onclick='edit(" + item.projectId + ")'><i class='fas fa-pen'></i></button> | ";
+        tr += "<button class='btn btn-danger' onclick='deleteProject(" + item.projectId + ")'><i class='fas fa-trash'></i></button></td>";
+
                         tr += "</tr>";
                     });
                     $('#tbl tbody').html(tr);

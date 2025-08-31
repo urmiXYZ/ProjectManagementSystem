@@ -59,6 +59,22 @@ namespace ProjectMannagementSystem.Controllers
             return Json(assignedProjects);
         }
 
+        [HttpGet]
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        public async Task<IActionResult> GetEmployees()
+        {
+            var employees = await _userManager.GetUsersInRoleAsync("Employee");
+            var result = employees.Select(u => new
+            {
+                id = u.Id,
+                userName = u.UserName
+            }).OrderBy(u => u.userName).ToList();
+
+            return Json(result);
+        }
+
+
+
         [HttpPost]
         [Authorize(Roles = "Admin,SuperAdmin")]
         public IActionResult Assign([FromBody] List<AssignedProject> models)

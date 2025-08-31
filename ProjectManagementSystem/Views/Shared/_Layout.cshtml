@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ProjectMannagementSystem</title>
+    <title>@ViewData["Title"] ProjectSphere - ProjectMannagementSystem</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -12,7 +12,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ProjectMannagementSystem</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ProjectSphere</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -23,69 +23,12 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="About">About</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-
-                        <ul class="navbar-nav">
-                            @if (User.IsInRole("Admin") )
-                            {
-                                <li class="nav-item"><a class="nav-link" href="/User/Index">Users</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/Project/Index">Projects</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/AssignProject/Index">Assigned Projects</a></li>
-                            }
-                            @if (User.IsInRole("SuperAdmin"))
-                            {
-                                <li class="nav-item"><a class="nav-link" href="/Role/Index">Roles</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/User/Index">Users</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/Project/Index">Projects</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/AssignProject/Index">Assigned Projects</a></li>
-                            }
-                            else if (User.IsInRole("Employee"))
-                            {
-                                <li class="nav-item"><a class="nav-link" href="/AssignProject/Index">My Projects</a></li>
-                            }
-                        </ul>
-
                     </ul>
-
-                    @inject UserManager<User> UserManager
-
-                    <ul class="navbar-nav ms-auto">
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            var currentUser = await UserManager.GetUserAsync(User);
-                            var firstName = currentUser?.FullName?.Split(' ')[0];
-                            var pictureUrl = string.IsNullOrEmpty(currentUser?.PicturePath)
-                            ? "/images/default-avatar.png"
-                            : currentUser.PicturePath;
-                            <li class="nav-item"><a class="nav-link" href="/User/Profile">Profile</a></li>
-
-                            <li class="nav-item d-flex align-items-center">
-                                <img id="navProfileImage"
-                                     src="@pictureUrl"
-                                     alt="Profile"
-                                     style="width:32px; height:32px; border-radius:50%; margin-right:8px;" />
-
-                                <span class="nav-link text-dark" style="font-style: italic; padding:0;">
-                                    Hello, @firstName!
-                                </span>
-                            </li>
-                            <li class="nav-item">
-                                <form class="d-inline" asp-area="" asp-controller="Account" asp-action="Logout" method="post">
-                                    <button type="submit" class="btn btn-link nav-link text-dark">Logout</button>
-                                </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-                            </li>
-                        }
-                    </ul>
-
-                   
-
                 </div>
             </div>
         </nav>
@@ -98,7 +41,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - ProjectMannagementSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; ProjectSphere 2025 - ProjectManagementSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -106,4 +49,4 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
-</html>
+ 

@@ -1,27 +1,62 @@
 ﻿@{
-    ViewData["Title"] = "Assigned Projects";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
+@if (User.IsInRole("Employee"))
+{
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Assigned Projects</h1>
+                </div><!-- /.col -->
 
+                
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+}
 @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
 {
-    <div class="mb-3 d-flex gap-2">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Assigned Projects</h1>
+                </div><!-- /.col -->
+
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "Project")">Projects</a>
+                        </li>
+                        <li class="breadcrumb-item active">Assigned Projects</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <div class="d-flex align-items-center mt-4 mb-4" style="gap: 15px; padding-left: 20px;">
         <button type="button" class="btn btn-primary" onclick="openAssignProjectModal()">
-            Assign Project <i class="fa fa-plus"></i>
+            Assign Project <i class="fas fa-plus"></i>
         </button>
+
         <a href="/Project/Index" class="btn btn-secondary">
-            All Projects <i class="fa fa-arrow-left"></i>
+            All Projects <i class="fas fa-arrow-left"></i>
         </a>
-        <button id="exportAssigned" class="btn btn-success">
-            <i class="fa fa-file-excel"></i> Export Assigned Projects
+
+        <button id="exportAssigned" class="btn btn-success d-flex align-items-center justify-content-center">
+            <i class="fas fa-file-excel me-2"></i> Export Assigned Projects
         </button>
     </div>
+
+
 
     <div class="input-group mb-3">
         <span class="input-group-text"><i class="fa fa-search"></i></span>
         <input type="text" id="searchAssigned" class="form-control" placeholder="Search by user or project name...">
     </div>
 }
-<h2>Assigned projects</h2>
+
 <table id="assignedProjectsTbl" class="table table-bordered">
     <thead>
         <tr>
@@ -96,7 +131,7 @@
                 <input type="date" id="newDueDate" class="form-control">
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button class="btn btn-info" onclick="resubmitTask()">Resubmit</button>
             </div>
         </div>
@@ -179,12 +214,16 @@
             });
         }
 
-        function openAssignProjectModal() {
-            $.get('/User/Get', function(data) {
+                        function openAssignProjectModal() {
+            $.get('/AssignProject/GetEmployees', function(data) {
                 $("#AssignUserId").empty();
-                $.each(data, function(i, user) {
-                    $("#AssignUserId").append(`<option value="${user.id}">${user.userName}</option>`);
-                });
+                if (data.length === 0) {
+                    $("#AssignUserId").append('<option disabled>No employees found</option>');
+                } else {
+                    $.each(data, function(i, user) {
+                        $("#AssignUserId").append(`<option value="${user.id}">${user.userName}</option>`);
+                    });
+                }
             });
 
             $.get('/Project/GetAll', function(data) {
@@ -197,6 +236,8 @@
             $("#AssignDueDate").val('');
             $("#assignModal").modal('show');
         }
+
+
 
         $("#btnAssignSave").click(function() {
             var userIds = $("#AssignUserId").val();
@@ -322,13 +363,15 @@
             });
         }
 
-                function openResubmitModal(assignId, currentDueDate) {
+                        var resubmitModal = new bootstrap.Modal(document.getElementById('resubmitModal'));
+
+        function openResubmitModal(assignId, currentDueDate) {
             $("#resubmitAssignId").val(assignId);
             $("#newDueDate").val(currentDueDate);
-            var modal = new bootstrap.Modal(document.getElementById('resubmitModal'));
-            modal.show();
+            resubmitModal.show();
         }
-                function resubmitTask() {
+
+        function resubmitTask() {
             var assignId = $("#resubmitAssignId").val();
             var newDueDate = $("#newDueDate").val();
 
@@ -342,8 +385,7 @@
                 type: 'POST',
                 data: { assignId: assignId, dueDate: newDueDate },
                 success: function(res) {
-                    alert(res.msg);
-                    $('#resubmitModal').modal('hide');
+                    resubmitModal.hide();
                     loadAssignedProjects();
                 },
                 error: function(err) {
@@ -352,10 +394,10 @@
             });
         }
 
-
         $(document).ready(function() {
             loadAssignedProjects();
         });
+
     </script>
 }
 

@@ -2,16 +2,28 @@
     ViewData["Title"] = "Login";
 }
 
-<h2>Login</h2>
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%;">
+        <!-- Logo -->
+        <div class="text-center mb-4">
+            <img src="~/Auth/dist/img/Home.png" alt="ProjectSphere Logo" style="max-width: 150px;">
+        </div>
 
-<form asp-action="Login" method="post">
-    <div class="mb-3">
-        <label>Email</label>
-        <input type="email" name="email" class="form-control" required />
+        <h2 class="text-center mb-4 fw-bold">Login</h2>
+
+        <form asp-action="Login" method="post">
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" placeholder="Enter your email" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Enter your password" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+
     </div>
-    <div class="mb-3">
-        <label>Password</label>
-        <input type="password" name="password" class="form-control" required />
-    </div>
-    <button type="submit" class="btn btn-primary">Login</button>
-</form>
+</div>

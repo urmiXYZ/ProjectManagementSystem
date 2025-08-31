@@ -6,19 +6,26 @@ namespace ProjectMannagementSystem.Models
 {
     public class User : IdentityUser<int>
     {
-        //[Key]
-        // public int UserId { get; set; }
-        // public string UserName { get; set; }
+        [Required, StringLength(100)]
         public string FullName { get; set; }
+
+        [Range(18, 65, ErrorMessage = "Age must be between 18 and 65.")]
         public byte Age { get; set; }
-     //   public string Email { get; set; }
-      //  public string Phone { get; set; }
-        public DateTime JoinedAt { get; set; }
+
+        [Required, EmailAddress]
+        public override string Email { get; set; }
+
+        [Phone]
+        public override string PhoneNumber { get; set; }
+
+        public DateTime JoinedAt { get; set; } = DateTime.Now;
+
         public string? PicturePath { get; set; }
+
         [NotMapped]
         public IFormFile? Picture { get; set; }
+
         public virtual ICollection<AssignedProject> AssignedProjects { get; set; } = new List<AssignedProject>();
-
-
     }
+
 }

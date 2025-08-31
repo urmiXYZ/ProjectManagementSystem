@@ -1,0 +1,256 @@
+﻿@{
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+@inject UserManager<User> UserManager
+@inject SignInManager<User> SignInManager
+@{
+    var currentUser = await UserManager.GetUserAsync(User);
+    var roles = await UserManager.GetRolesAsync(currentUser);
+}
+@if (roles.Contains("SuperAdmin") || roles.Contains("Admin"))
+{
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Dashboard</h1>
+                </div><!-- /.col -->
+
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <div class="row">
+        <div class="col-lg-4 col-6">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3>@Model.TotalUsers</h3>
+                    <p>Total Users</p>
+                </div>
+                <div class="icon"><i class="fas fa-users"></i></div>
+                <a href="@Url.Action("Index", "User")" class="small-box-footer">
+                    More info <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-6">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>@Model.TotalProjects</h3>
+                    <p>Total Projects</p>
+                </div>
+                <div class="icon"><i class="fas fa-tasks"></i></div>
+                <a href="@Url.Action("Index", "Project")" class="small-box-footer">
+                    More info <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-6">
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3>@Model.ActiveProjects</h3>
+                    <p>Active Projects</p>
+                </div>
+                <div class="icon"><i class="fas fa-play-circle"></i></div>
+                <a href="@Url.Action("Index", "AssignProject")" class="small-box-footer">
+                    More info <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Recent Users</h3>
+        </div>
+        <div class="card-body table-responsive p-0">
+            <table class="table table-hover text-nowrap">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Joined</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.RecentUsers)
+                    {
+                        <tr>
+                            <td>
+                                <a href="@Url.Action("Profile", "User", new { id = user.Id })">
+                                    @user.FullName
+                                </a>
+                            </td>
+                            <td>
+                                @{
+                                    var userRoles = await UserManager.GetRolesAsync(user);
+                                    @string.Join(", ", userRoles)
+                                }
+                            </td>
+
+                            <td>@user.JoinedAt.ToShortDateString()</td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Users by Role</h3>
+        </div>
+        <div class="card-body" style="height:300px;">
+            <canvas id="roleChart"></canvas>
+        </div>
+    </div>
+}
+else if (roles.Contains("Employee"))
+{
+    <!-- Employee Dashboard -->
+    <div class="row">
+        <div class="col-lg-6 col-12">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>@Model.MyProjectsCount</h3>
+                    <p>Assigned Projects</p>
+                </div>
+                <div class="icon"><i class="fas fa-tasks"></i></div>
+                <a href="@Url.Action("Index", "AssignProject")" class="small-box-footer">
+                    View Projects <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <!-- Projects by Status Card -->
+        <div class="col-lg-6 col-12">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3>@Model.InProgressCount / @Model.CompletedCount / @Model.OnHoldCount/ @Model.CancelledCount</h3>
+                    <p>Projects Status (InProgress / Completed / On Hold/ Cancelled)</p>
+                </div>
+                <div class="icon"><i class="fas fa-chart-pie"></i></div>
+                <a href="@Url.Action("Index", "AssignProject")" class="small-box-footer">
+                    View Details <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- Employee Calendar Widget -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary">
+                    <h3 class="card-title">My Calendar</h3>
+                </div>
+                <!-- Calendar Legend -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="calendar-legend">
+                            <div style="margin-left: 20px; margin-bottom: 8px;">
+                                <span class="badge" style="background-color:#f39c12;">&nbsp;&nbsp;</span> In Progress
+                            </div>
+                            <div style="margin-left: 20px; margin-bottom: 8px;">
+                                <span class="badge" style="background-color:#00a65a;">&nbsp;&nbsp;</span> Completed
+                            </div>
+                            <div style="margin-left: 20px; margin-bottom: 8px;">
+                                <span class="badge" style="background-color:#f56954;">&nbsp;&nbsp;</span> On Hold / Cancelled
+                            </div>
+                            <div style="margin-left: 20px; margin-bottom: 8px;">
+                                <span class="badge" style="background-color:#3c8dbc;">&nbsp;&nbsp;</span> Other
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="card-body">
+                    <div id="employeeCalendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section Scripts {
+    @if (roles.Contains("SuperAdmin") || roles.Contains("Admin"))
+    {
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            // assign Razor values to JS variables
+            var superAdmin = @Model.SuperAdminCount;
+            var admin = @Model.AdminCount;
+            var employee = @Model.EmployeeCount;
+
+            var ctx = document.getElementById('roleChart').getContext('2d');
+            var roleChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['SuperAdmin', 'Admin', 'Employee'],
+                    datasets: [{
+                        data: [superAdmin, admin, employee],
+                        backgroundColor: ['#f39c12', '#00c0ef', '#00a65a']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let value = context.raw;
+                                    let total = context.chart._metasets[context.datasetIndex].total;
+                                    let percent = ((value / total) * 100).toFixed(1);
+                                    return context.label + ': ' + value + ' (' + percent + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+    }
+    else if (roles.Contains("Employee"))
+    {
+        <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+        <script>
+                                  document.addEventListener('DOMContentLoaded', function() {
+                var calendarEl = document.getElementById('employeeCalendar');
+                if (calendarEl) {
+                    var calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth',
+                        headerToolbar: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                        },
+                        events: [
+            @foreach (var evt in Model.MyProjectEvents)
+            {
+                <text>
+                                    {
+                                        title: '@evt.Title',
+                                        start: '@evt.Start.ToString("yyyy-MM-dd")',
+                                        end: '@evt.End?.ToString("yyyy-MM-dd")',
+                                        color: '@evt.Color'
+                                    },
+                </text>
+            }
+                        ]
+                    });
+                    calendar.render();
+                }
+            });
+        </script>
+    }
+}
+
+
+
+
+
+

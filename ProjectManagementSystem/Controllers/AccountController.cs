@@ -33,7 +33,7 @@ public class AccountController : Controller
             if (result.Succeeded)
             {
                 if (string.IsNullOrEmpty(returnUrl))
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Dashboard", "AuthUser");
                 return LocalRedirect(returnUrl);
             }
         }
@@ -46,6 +46,6 @@ public class AccountController : Controller
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Login", "Account");
     }
 }

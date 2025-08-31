@@ -1,6 +1,8 @@
 ﻿@model ProjectMannagementSystem.Models.User
 @using Microsoft.AspNetCore.Identity
-
+@{
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
 <div class="card p-3">
     <h4>My Profile</h4>
     <img id="profileImage" src="/images/default-avatar.png" style="width:100px; height:100px; border-radius:8px; margin-bottom:10px;" />

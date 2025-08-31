@@ -1,8 +1,57 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿<div class="container vh-100 d-flex flex-column justify-content-center align-items-center text-center bg-light">
+    <!-- Logo -->
+    <div class="mb-4">
+        <img src="~/Auth/dist/img/Home.png" alt="ProjectSphere Logo" style="max-width: 200px;">
+    </div>
+    <!-- Hero Section -->
+    <div class="p-5 bg-white rounded shadow-lg text-center">
+        <h1 class="display-3 fw-bold mb-3 text-primary">Welcome to ProjectSphere</h1>
+        <p class="lead mb-4 text-secondary">
+            Manage your projects, teams, and tasks efficiently with <strong>ProjectSphere</strong> — a modern project management system for seamless collaboration and tracking.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            @inject SignInManager<User> SignInManager
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <a href="/AuthUser/Dashboard" class="btn btn-primary btn-lg shadow-sm">Go to Dashboard</a>
+            }
+            else
+            {
+                <a href="/Account/Login" class="btn btn-primary btn-lg shadow-sm">Login to Dashboard</a>
+            }
+            <a href="/Home/About" class="btn btn-outline-primary btn-lg">Learn More</a>
+        </div>
+    </div>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+    <!-- Optional Feature Cards -->
+    <div class="row mt-5 w-100 justify-content-center">
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-tasks fa-2x text-primary mb-3"></i>
+                    <h5 class="card-title">Manage Projects</h5>
+                    <p class="card-text text-muted">Create, assign, and track all your projects efficiently.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-users fa-2x text-success mb-3"></i>
+                    <h5 class="card-title">Team Collaboration</h5>
+                    <p class="card-text text-muted">Communicate and collaborate with your team seamlessly.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-chart-pie fa-2x text-warning mb-3"></i>
+                    <h5 class="card-title">Analytics & Reports</h5>
+                    <p class="card-text text-muted">Track progress with intuitive dashboards and charts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
