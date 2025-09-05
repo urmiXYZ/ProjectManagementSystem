@@ -20,22 +20,45 @@ namespace ProjectMannagementSystem.Controllers
             var tasks = _dbContext.Projects.ToList();
             return View(tasks);
         }
+
+
         [HttpGet]
         public IActionResult GetAll()
         {
             var projects = _dbContext.Projects
-                             .Include(p => p.Category) 
+                             .Include(p => p.Category) // Category includes Department
+                             .ThenInclude(c => c.Department)
                              .ToList();
 
             var result = projects.Select(p => new {
                 ProjectId = p.ProjectId,
                 ProjectName = p.ProjectName,
                 Description = p.Description,
-                CategoryName = p.Category != null ? p.Category.Name : "None" 
+                CategoryName = p.Category != null ? p.Category.Name : "None",
+                DepartmentId = p.Category != null && p.Category.Department != null ? p.Category.Department.DepartmentId : (int?)null
             }).ToList();
 
             return Json(result);
         }
+
+
+        [HttpGet]
+        public IActionResult GetAllByDepartment(int departmentId)
+        {
+            var projects = _dbContext.Projects
+                .Include(p => p.Category)
+                .Where(p => p.Category.DepartmentId == departmentId) // <- department via category
+                .Select(p => new {
+                    ProjectId = p.ProjectId,
+                    ProjectName = p.ProjectName,
+                    CategoryName = p.Category != null ? p.Category.Name : "None"
+                })
+                .ToList();
+
+            return Json(projects);
+        }
+
+
         public IActionResult Create()
         {
             return View();

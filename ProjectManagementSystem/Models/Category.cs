@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjectMannagementSystem.Models
 {
@@ -14,5 +15,10 @@ namespace ProjectMannagementSystem.Models
         public string? Description { get; set; }
 
         public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
+        public int? DepartmentId { get; set; } 
+        [ForeignKey("DepartmentId")]
+        public virtual Department? Department { get; set; }
+
+
     }
 }

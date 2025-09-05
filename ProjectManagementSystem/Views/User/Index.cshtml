@@ -42,7 +42,8 @@
             <th>Full Name</th>
             <th>Username</th>
             <th>Email</th>
-            <th>Role</th> 
+            <th>Role</th>
+            <th>Department</th>
             <th>Assigned Projects</th>
             <th>Actions</th>
         </tr>
@@ -66,6 +67,16 @@
                     <option value="Admin">Admin</option>
                     <option value="Employee" selected>Employee</option>
                 </select>
+            </div>
+            <div>
+            <label class="mt-3">Select Department (for Employee only):</label>
+            <select id="assignRoleDepartment" class="form-select">
+                <option value="">--Select Department--</option>
+                @foreach (var dept in ViewBag.Departments as List<ProjectMannagementSystem.Models.Department>)
+                {
+                    <option value="@dept.DepartmentId">@dept.Name</option>
+                }
+            </select>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -105,6 +116,17 @@
                     <label for="PhoneNumber" class="form-label">Phone:</label>
                     <input type="text" id="PhoneNumber" class="form-control" />
                 </div>
+                <div class="mb-3" id="departmentDiv" style="display:none;">
+                    <label for="DepartmentId" class="form-label">Department:</label>
+                    <select id="DepartmentId" class="form-select">
+                        <option value="">-- Select Department --</option>
+                        @foreach (var dept in ViewBag.Departments as List<Department>)
+                        {
+                            <option value="@dept.DepartmentId">@dept.Name</option>
+                        }
+                    </select>
+                </div>
+
                 <div class="mb-3">
                     <label for="JoinedAt" class="form-label">Joined At:</label>
                     <input type="date" id="JoinedAt" class="form-control" />
@@ -147,6 +169,7 @@
     </div>
 </div>
 
+
 <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -176,8 +199,8 @@
             var value = $(this).val().toLowerCase();
             $("#userTbl tbody tr").filter(function () {
                 $(this).toggle(
-                    $(this).find("td:eq(1)").text().toLowerCase().indexOf(value) > -1 ||   // Full Name column
-                    $(this).find("td:eq(2)").text().toLowerCase().indexOf(value) > -1     // Username column
+                    $(this).find("td:eq(1)").text().toLowerCase().indexOf(value) > -1 ||  
+                    $(this).find("td:eq(2)").text().toLowerCase().indexOf(value) > -1     
                 );
             });
         });
@@ -185,7 +208,7 @@
             exportTableToCSV('users.csv', '#userTbl');
         });
 
-                    $("#btnUserSave").click(function () {
+                           $("#btnUserSave").click(function () {
             $(this).prop("disabled", true);
             var obj = {
                 FullName: $("#FullName").val(),
@@ -193,20 +216,21 @@
                 Age: $("#Age").val(),
                 Email: $("#Email").val(),
                 PhoneNumber: $("#PhoneNumber").val(),
-                JoinedAt: $("#JoinedAt").val()
+                JoinedAt: $("#JoinedAt").val(),
+                DepartmentId: $("#DepartmentId").val() || null // only for employee
             };
 
             $.post('/User/Save', obj, function () {
-    loadUsers();
-    if (currentUserModal) currentUserModal.hide();
-    clearUserForm();
-    $("#btnUserSave").prop("disabled", false);
-});
-
+                loadUsers();
+                if (currentUserModal) currentUserModal.hide();
+                clearUserForm();
+                $("#btnUserSave").prop("disabled", false);
+            });
         });
 
 
-                            $("#btnUserUpdate").click(function () {
+
+            $("#btnUserUpdate").click(function () {
             $(this).prop("disabled", true);
 
             var obj = {
@@ -216,7 +240,8 @@
                 Age: parseInt($("#Age").val()),
                 Email: $("#Email").val(),
                 PhoneNumber: $("#PhoneNumber").val(),
-                JoinedAt: $("#JoinedAt").val()
+                JoinedAt: $("#JoinedAt").val(),
+                DepartmentId: $("#DepartmentId").is(":visible") ? $("#DepartmentId").val() || null : null
             };
 
             $.ajax({
@@ -224,13 +249,12 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(obj),
-                        success: function () {
-            loadUsers();
-            if (currentUserModal) currentUserModal.hide(); 
-            clearUserForm();
-            $("#btnUserUpdate").prop("disabled", false);
-        },
-
+                success: function () {
+                    loadUsers();
+                    if (currentUserModal) currentUserModal.hide();
+                    clearUserForm();
+                    $("#btnUserUpdate").prop("disabled", false);
+                },
                 error: function(xhr) {
                     console.error(xhr.responseText);
                     $("#btnUserUpdate").prop("disabled", false);
@@ -238,19 +262,65 @@
             });
         });
 
+
+                $("#assignRoleSelect").on("change", function() {
+            var role = $(this).val();
+            if(role === "Employee") {
+                $("#assignRoleDepartment").prop("disabled", false);
+            } else {
+                $("#assignRoleDepartment").prop("disabled", true).val(""); // clear department
+            }
+        });
+
+                $("#btnAssignSave").click(function () {
+                    var userId = parseInt($("#AssignUserId").val());
+                    var projectIds = $("#AssignProjectId").val();
+                    var dueDate = $("#AssignDueDate").val();
+
+                    if (!projectIds || projectIds.length === 0) {
+                        alert("Please select at least one project.");
+                        return;
+                    }
+
+                    var assignments = projectIds.map(function(projectId) {
+                        return {
+                            UserId: userId,
+                            ProjectId: parseInt(projectId),
+                            DueDate: dueDate
+                        };
+                    });
+
+                    $.ajax({
+                        url: '/AssignProject/Assign',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(assignments),
+                        success: function () {
+                            $("#assignModal").modal('hide');
+                            loadUsers();
+                            loadAssignedProjects();
+                        },
+                        error: function (xhr) {
+                            console.error(xhr.responseText);
+                            alert("Failed to assign projects. Check console for details.");
+                        }
+                    });
+                });
          });
 
                                        function loadUsers() {
             $.get('/User/Get', function (data) {
                 $('#userTbl tbody').empty();
-                $.each(data, function (i, user) {
-                    var assignedProjects = user.assignedProjects
-                        ? user.assignedProjects.map(p => p.projectName).join(', ')
-                        : '';
+                        $.each(data, function (i, user) {
+            var assignedProjects = user.assignedProjects
+                ? user.assignedProjects.map(p => p.projectName).join(', ')
+                : '';
 
-                let actions = `<button class='btn btn-primary btn-sm' onclick='showProfile(${user.id})'>
-            <i class='fa fa-id-badge me-1'></i> Profile
-        </button>`;
+            var departmentName = user.departmentName || "None"; // <-- ADD THIS
+
+            let actions = `<button class='btn btn-primary btn-sm' onclick='showProfile(${user.id})'>
+                <i class='fa fa-id-badge me-1'></i> Profile
+            </button>`;
 
 
                     if (user.role !== "SuperAdmin") {
@@ -267,18 +337,19 @@
                         }
                     }
 
-                    var row = `<tr>
-                        <td>${user.id}</td>
-                        <td>${user.fullName}</td>
-                        <td>${user.userName}</td>
-                        <td>${user.email}</td>
-                        <td>${user.role}</td>
-                        <td>${assignedProjects}</td>
-                        <td>${actions}</td>
-                    </tr>`;
+                             var row = `<tr>
+                <td>${user.id}</td>
+                <td>${user.fullName}</td>
+                <td>${user.userName}</td>
+                <td>${user.email}</td>
+                <td>${user.role}</td>
+                <td>${departmentName}</td> <!-- FIXED -->
+                <td>${assignedProjects}</td>
+                <td>${actions}</td>
+            </tr>`;
 
-                    $('#userTbl tbody').append(row);
-                });
+            $('#userTbl tbody').append(row);
+        });
             });
         }
 
@@ -307,7 +378,7 @@
         }
                                let currentUserModal; // global
 
-        function editUser(id) {
+                function editUser(id) {
             $.get('/User/GetById/' + id, function (user) {
                 if (!user) return alert("User not found");
 
@@ -320,6 +391,15 @@
                 $("#JoinedAt").val(user.joinedAt ? user.joinedAt.split('T')[0] : '');
                 $("#JoinedAt").prop("readonly", true);
 
+                // Department logic
+                if (user.role === "Employee") {
+                    $("#departmentDiv").show();
+                    $("#DepartmentId").val(user.departmentId || "");
+                } else {
+                    $("#departmentDiv").hide();
+                    $("#DepartmentId").val("");
+                }
+
                 $("#userModalLabel").text("Edit User");
                 $("#btnUserSave").hide();
                 $("#btnUserUpdate").show();
@@ -328,6 +408,7 @@
                 currentUserModal.show();
             });
         }
+
 
 
 
@@ -349,7 +430,7 @@
             $("#btnUserUpdate").hide();
         }
 
-            function openAssignModal(id) {
+                function openAssignModal(id) {
             $("#AssignUserId").val(id);
 
             $.get('/Project/GetAll', function (projects) {
@@ -363,8 +444,8 @@
         }
 
                   $("#btnAssignSave").click(function () {
-            var userId = parseInt($("#AssignUserId").val()); 
-            var projectIds = $("#AssignProjectId").val(); 
+            var userId = parseInt($("#AssignUserId").val());
+            var projectIds = $("#AssignProjectId").val();
             var dueDate = $("#AssignDueDate").val();
 
             if (!projectIds || projectIds.length === 0) {
@@ -374,7 +455,7 @@
 
             var assignments = projectIds.map(function(projectId) {
                 return {
-                    UserId: userId,        
+                    UserId: userId,
                     ProjectId: parseInt(projectId),
                     DueDate: dueDate
                 };
@@ -398,6 +479,46 @@
         });
 
 
+
+
+
+
+                        function assignRole() {
+            var selectedUsers = $("#assignRoleUsers").val();
+            var role = $("#assignRoleSelect").val();
+        var departmentId = role === "Employee" ? parseInt($("#assignRoleDepartment").val()) : null;
+
+            if(!selectedUsers || selectedUsers.length === 0) {
+                alert("Please select at least one user.");
+                return;
+            }
+
+            if(role === "Employee" && !departmentId) {
+                alert("Please select a department for Employee.");
+                return;
+            }
+
+            $.ajax({
+                url: '/User/AssignRole',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    userIds: selectedUsers.map(id => parseInt(id)),
+                    role: role,
+                    departmentId: departmentId
+                }),
+                success: function(res) {
+                    if(assignRoleModalInstance) assignRoleModalInstance.hide();
+                    loadUsers();
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    alert("Server error: " + error);
+                }
+            });
+        }
+
+
                 function showProfile(id) {
             $.get('/User/GetById/' + id, function(user) {
                 var html = `
@@ -418,11 +539,14 @@
             });
         }
 
-                function openAddUserModal() {
+                       function openAddUserModal() {
             clearUserForm();
             $("#userModalLabel").text("Add User");
             $("#btnUserSave").show();
             $("#btnUserUpdate").hide();
+
+            // Show department selector only for employee
+            $("#departmentDiv").show();
 
             if (!currentUserModal) {
                 currentUserModal = new bootstrap.Modal(document.getElementById('userModal'));
@@ -431,50 +555,25 @@
         }
 
 
+
                       let assignRoleModalInstance;
 
         function openAssignRoleModal() {
-            $.get('/User/Get', function(data) {
-                $("#assignRoleUsers").empty();
-                $.each(data, function(i, user) {
-                    $("#assignRoleUsers").append(
-                        `<option value="${user.id}">${user.fullName} (${user.userName}) - ${user.role}</option>`
-                    );
-                });
-            });
+                    $.get('/User/Get', function(data) {
+                        $("#assignRoleUsers").empty();
+                        $.each(data, function(i, user) {
+                            $("#assignRoleUsers").append(
+                                `<option value="${user.id}">${user.fullName} (${user.userName}) - ${user.role}</option>`
+                            );
+                        });
+                    });
 
-            if (!assignRoleModalInstance) {
-                assignRoleModalInstance = new bootstrap.Modal(document.getElementById('assignRoleModal'));
-            }
-            assignRoleModalInstance.show();
-        }
+                    if (!assignRoleModalInstance) {
+                        assignRoleModalInstance = new bootstrap.Modal(document.getElementById('assignRoleModal'));
+                    }
+                    assignRoleModalInstance.show();
+                }
 
-
-        function assignRole() {
-            var selectedUsers = $("#assignRoleUsers").val(); 
-            var role = $("#assignRoleSelect").val();
-
-            if (!selectedUsers || selectedUsers.length === 0) {
-                alert("Please select at least one user.");
-                return;
-            }
-
-                                 $.ajax({
-            url: '/User/AssignRole',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ userIds: selectedUsers.map(id => parseInt(id)), role: role }),
-            success: function(res) {
-                if (assignRoleModalInstance) assignRoleModalInstance.hide();
-                loadUsers();
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-                alert("Server error: " + error);
-            }
-        });
-
-}
 
 
     </script>

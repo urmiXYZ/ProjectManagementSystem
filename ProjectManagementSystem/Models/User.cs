@@ -26,6 +26,11 @@ namespace ProjectMannagementSystem.Models
         public IFormFile? Picture { get; set; }
 
         public virtual ICollection<AssignedProject> AssignedProjects { get; set; } = new List<AssignedProject>();
+        public int? DepartmentId { get; set; }  
+
+        [ForeignKey("DepartmentId")]
+        public virtual Department? Department { get; set; }
+
     }
 
 }

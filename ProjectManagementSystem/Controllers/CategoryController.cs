@@ -19,10 +19,15 @@ namespace ProjectMannagementSystem.Controllers
         public async Task<IActionResult> Index()
         {
             var categories = await _context.Categories
-                                           .Include(c => c.Projects) 
+                                           .Include(c => c.Projects)
+                                           .Include(c => c.Department)
                                            .ToListAsync();
+
+            ViewBag.Departments = await _context.Departments.ToListAsync();
+
             return View(categories);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Save(Category category)
@@ -36,12 +41,10 @@ namespace ProjectMannagementSystem.Controllers
 
             if (category.CategoryId == 0)
             {
-                // New category
                 _context.Categories.Add(category);
             }
             else
             {
-                // Existing category
                 _context.Categories.Update(category);
             }
 
@@ -49,15 +52,16 @@ namespace ProjectMannagementSystem.Controllers
             return Json(new { success = true });
         }
 
-
-
         [HttpGet]
         public async Task<IActionResult> Get(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.Categories
+                                         .Include(c => c.Department)
+                                         .FirstOrDefaultAsync(c => c.CategoryId == id);
             if (category == null) return NotFound();
             return Json(category);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Delete(int id)

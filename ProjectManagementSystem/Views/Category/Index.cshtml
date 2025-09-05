@@ -14,6 +14,7 @@
             <th>Name</th>
             <th>Description</th>
             <th>Projects Count</th>
+            <th>Department</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -24,6 +25,7 @@
                 <td>@category.Name</td>
                 <td>@category.Description</td>
                 <td>@category.Projects.Count</td>
+                <td>@(category.Department != null ? category.Department.Name : "None")</td>
                 <td>
                     <button class="btn btn-primary btn-sm"
                             onclick="openEditCategoryModal(@category.CategoryId, '@category.Name', '@category.Description')">
@@ -61,6 +63,17 @@
                         <label for="Description" class="form-label">Description</label>
                         <textarea class="form-control" id="Description" name="Description" maxlength="500"></textarea>
                     </div>
+                    <div class="mb-3">
+                        <label for="DepartmentId" class="form-label">Department</label>
+                        <select id="DepartmentId" name="DepartmentId" class="form-select" required>
+                            <option value="">Select Department</option>
+                            @foreach (var dept in ViewBag.Departments as List<ProjectMannagementSystem.Models.Department>)
+                            {
+                                <option value="@dept.DepartmentId">@dept.Name</option>
+                            }
+                        </select>
+                    </div>
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -104,14 +117,16 @@
             modal.show();
         }
 
-        function openEditCategoryModal(id, name, description) {
+                function openEditCategoryModal(id, name, description, departmentId) {
             $('#categoryModalTitle').text('Edit Category');
             $('#CategoryId').val(id);
             $('#Name').val(name);
             $('#Description').val(description);
+            $('#DepartmentId').val(departmentId); 
             var modal = new bootstrap.Modal(document.getElementById('categoryModal'));
             modal.show();
         }
+
 
                        let deleteCategoryId = 0;
 

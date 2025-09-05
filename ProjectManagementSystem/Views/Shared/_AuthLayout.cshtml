@@ -114,6 +114,41 @@
                                 <p>Home</p>
                             </a>
                             </li>
+                            @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+                            {
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-circle"></i>
+                                    <p>
+                                        User<i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="/User/Index" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>User List</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-circle"></i>
+                                    <p>
+                                        Category<i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="/Category/Index" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Category List</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            }
                         <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-circle"></i>
@@ -143,25 +178,7 @@
 
                             </ul>
                         </li>
-                            @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
-                            {
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="nav-icon fas fa-circle"></i>
-                                    <p>
-                                        User<i class="right fas fa-angle-left"></i>
-                                    </p>
-                                </a>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a href="/User/Index" class="nav-link">
-                                            <i class="far fa-circle nav-icon"></i>
-                                            <p>User List</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            }
+                            
                             @if (User.IsInRole("SuperAdmin"))
                             {
                             <li class="nav-item">
@@ -184,14 +201,14 @@
                                 <a href="#" class="nav-link">
                                     <i class="nav-icon fas fa-circle"></i>
                                     <p>
-                                        Category<i class="right fas fa-angle-left"></i>
+                                        Department<i class="right fas fa-angle-left"></i>
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
-                                        <a href="/Category/Index" class="nav-link">
+                                        <a href="/Department/Index" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
-                                            <p>Category List</p>
+                                            <p>Department List</p>
                                         </a>
                                     </li>
                                 </ul>

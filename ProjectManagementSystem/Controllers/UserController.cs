@@ -21,23 +21,28 @@ namespace ProjectMannagementSystem.Controllers
             _context = context;
         }
         [Authorize(Roles = "Admin,SuperAdmin")]
-
         public IActionResult Index()
         {
+            ViewBag.Departments = _context.Departments
+                                          .Include(d => d.Employees)
+                                          .ToList();
             var users = _context.Users.ToList();
             return View(users);
         }
+
         [HttpGet]
         [Authorize(Roles = "Admin,SuperAdmin")]
         public async Task<IActionResult> Get()
         {
             var users = await _userManager.Users
+                .Include(u => u.Department) // include department
                 .Select(u => new
                 {
                     id = u.Id,
                     fullName = u.FullName,
                     userName = u.UserName,
                     email = u.Email,
+                    departmentName = u.Department != null ? u.Department.Name : "None", // add department
                     assignedProjects = u.AssignedProjects
                         .Select(ap => new { projectName = ap.Project.ProjectName }).ToList()
                 })
@@ -59,6 +64,7 @@ namespace ProjectMannagementSystem.Controllers
                     u.fullName,
                     u.userName,
                     u.email,
+                    u.departmentName,        // include department here
                     u.assignedProjects,
                     role = roles.FirstOrDefault() ?? "None"
                 });
@@ -68,6 +74,7 @@ namespace ProjectMannagementSystem.Controllers
         }
 
 
+
         public IActionResult Profile()
         {
             var userId = int.Parse(_userManager.GetUserId(User));
@@ -75,42 +82,38 @@ namespace ProjectMannagementSystem.Controllers
             return View();
         }
 
-        [HttpGet]
         [Authorize]
+        [HttpGet]
         public async Task<IActionResult> GetById(int id)
         {
-            var user = _context.Users
-                .Where(u => u.Id == id)
-                .Select(u => new
-                {
-                    u.Id,
-                    u.FullName,
-                    u.UserName,
-                    u.Age,
-                    u.Email,
-                    u.PhoneNumber,
-                    u.JoinedAt,
-                    u.PicturePath,
-                    AssignedProjects = u.AssignedProjects
-            .Select(ap => new { ap.Project.ProjectName }).ToList()
-                })
-                .FirstOrDefault();
+            var user = await _userManager.Users
+                .Include(u => u.Department)
+                .Include(u => u.AssignedProjects)
+                .ThenInclude(ap => ap.Project)
+                .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null) return NotFound();
 
-            if (User.IsInRole("Employee"))
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return Json(new
             {
-                var loggedInUser = await _userManager.GetUserAsync(User);
-                if (loggedInUser == null) return Unauthorized();
-
-                if (user.Id != loggedInUser.Id)
-                {
-                    return Forbid();
-                }
-            }
-
-            return Json(user);
+                id = user.Id,
+                fullName = user.FullName,
+                userName = user.UserName,
+                age = user.Age,
+                email = user.Email,
+                phoneNumber = user.PhoneNumber,
+                joinedAt = user.JoinedAt,
+                departmentId = user.DepartmentId,
+                departmentName = user.Department != null ? user.Department.Name : "None",
+                assignedProjects = user.AssignedProjects
+                    .Select(ap => new { projectName = ap.Project.ProjectName })
+                    .ToList(),
+                role = roles.FirstOrDefault() ?? "None"
+            });
         }
+
 
 
 
@@ -129,6 +132,14 @@ namespace ProjectMannagementSystem.Controllers
 
                 await _userManager.AddToRoleAsync(user, "Employee");
 
+                // Only assign Department if role is Employee
+                if (user.DepartmentId.HasValue)
+                {
+                    var employee = await _userManager.FindByIdAsync(user.Id.ToString());
+                    employee.DepartmentId = user.DepartmentId;
+                    await _userManager.UpdateAsync(employee);
+                }
+
                 return Json(new { data = user, password, msg = "Successfully added" });
             }
 
@@ -138,9 +149,9 @@ namespace ProjectMannagementSystem.Controllers
 
 
 
+
         [HttpPost]
         [Authorize]
-
         public async Task<IActionResult> Update([FromBody] User user)
         {
             if (user == null || user.Id <= 0)
@@ -150,6 +161,7 @@ namespace ProjectMannagementSystem.Controllers
             if (existingUser == null)
                 return Json(new { data = user, msg = "User does not exist" });
 
+            // Prevent employees from editing other users
             if (User.IsInRole("Employee"))
             {
                 var loggedInUserId = _userManager.GetUserId(User);
@@ -158,17 +170,27 @@ namespace ProjectMannagementSystem.Controllers
                     return Forbid();
                 }
             }
+
+            // Basic fields
             existingUser.FullName = user.FullName;
             existingUser.UserName = user.UserName;
             existingUser.NormalizedUserName = user.UserName.ToUpper();
-
             existingUser.Email = user.Email;
             existingUser.NormalizedEmail = user.Email.ToUpper();
-
             existingUser.PhoneNumber = user.PhoneNumber;
-
             existingUser.Age = user.Age;
             existingUser.JoinedAt = user.JoinedAt;
+
+            // 🔑 Department handling
+            var roles = await _userManager.GetRolesAsync(existingUser);
+            if (roles.Contains("Employee"))
+            {
+                existingUser.DepartmentId = user.DepartmentId; // keep/update department
+            }
+            else
+            {
+                existingUser.DepartmentId = null; // Admins / SuperAdmins → no dept
+            }
 
             var result = await _userManager.UpdateAsync(existingUser);
 
@@ -180,6 +202,7 @@ namespace ProjectMannagementSystem.Controllers
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
             return Json(new { data = user, msg = "Failed to update", errors });
         }
+
 
 
         [HttpPost]
@@ -292,10 +315,15 @@ namespace ProjectMannagementSystem.Controllers
             try
             {
                 var userIds = data.GetProperty("userIds").EnumerateArray()
-                                  .Select(x => x.GetInt32()) 
-                                  .ToList();
+                                  .Select(x => x.GetInt32()).ToList();
 
                 string role = data.GetProperty("role").GetString();
+                int? departmentId = null;
+
+                if (role == "Employee" && data.TryGetProperty("departmentId", out var deptProp))
+                {
+                    departmentId = deptProp.GetInt32();
+                }
 
                 foreach (var id in userIds)
                 {
@@ -305,6 +333,23 @@ namespace ProjectMannagementSystem.Controllers
                     var roles = await _userManager.GetRolesAsync(user);
                     await _userManager.RemoveFromRolesAsync(user, roles);
                     await _userManager.AddToRoleAsync(user, role);
+
+                    // 🔑 Handle department rules
+                    if (role == "Admin" || role == "SuperAdmin")
+                    {
+                        user.DepartmentId = null;
+                    }
+                    else if (role == "Employee")
+                    {
+                        if (!departmentId.HasValue)
+                        {
+                            return BadRequest(new { msg = $"Employee must have a department." });
+                        }
+
+                        user.DepartmentId = departmentId.Value;
+                    }
+
+                    await _userManager.UpdateAsync(user);
                 }
 
                 return Json(new { msg = "Roles assigned successfully." });
@@ -314,6 +359,8 @@ namespace ProjectMannagementSystem.Controllers
                 return StatusCode(500, new { msg = "Server error", error = ex.Message });
             }
         }
+
+
 
 
 

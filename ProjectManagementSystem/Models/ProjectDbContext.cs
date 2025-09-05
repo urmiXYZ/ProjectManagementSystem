@@ -14,5 +14,6 @@ namespace ProjectMannagementSystem.Models
         public DbSet<Project> Projects { get; set; }
         public DbSet<AssignedProject> AssignedProjects { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Department> Departments { get; set; }
     }
 }

@@ -214,48 +214,62 @@
             });
         }
 
-                        function openAssignProjectModal() {
-            $.get('/AssignProject/GetEmployees', function(data) {
+                                function openAssignProjectModal() {
+            // Get employees
+            $.get('/AssignProject/GetEmployees', function(employees) {
                 $("#AssignUserId").empty();
-                if (data.length === 0) {
+                if (employees.length === 0) {
                     $("#AssignUserId").append('<option disabled>No employees found</option>');
                 } else {
-                    $.each(data, function(i, user) {
+                    $.each(employees, function(i, user) {
                         $("#AssignUserId").append(`<option value="${user.id}">${user.userName}</option>`);
                     });
                 }
-            });
 
-            $.get('/Project/GetAll', function(data) {
-                $("#AssignProjectId").empty();
-                $.each(data, function(i, project) {
-                    $("#AssignProjectId").append(`<option value="${project.projectId}">${project.projectName}</option>`);
+                // Once employees are loaded, get the department of the first employee (or selected one)
+                var firstUserId = employees.length ? employees[0].id : null;
+                if (!firstUserId) return;
+
+                $.get('/User/GetById/' + firstUserId, function(user) {
+                    var departmentId = user.departmentId;
+
+                    // Get projects for that department
+                    $.get('/Project/GetAllByDepartment?departmentId=' + departmentId, function(projects) {
+                        $("#AssignProjectId").empty();
+                        $.each(projects, function(i, project) {
+                            $("#AssignProjectId").append(`<option value="${project.ProjectId}">${project.ProjectName}</option>`);
+                        });
+
+                        // Clear due date
+                        $("#AssignDueDate").val('');
+
+                        // Show modal once everything is ready
+                        $("#assignModal").modal('show');
+                    });
                 });
             });
-
-            $("#AssignDueDate").val('');
-            $("#assignModal").modal('show');
         }
-
-
 
         $("#btnAssignSave").click(function() {
             var userIds = $("#AssignUserId").val();
             var projectIds = $("#AssignProjectId").val();
             var dueDate = $("#AssignDueDate").val();
 
+            if (!userIds || !projectIds) {
+                alert("Please select users and projects.");
+                return;
+            }
+
             var assignments = [];
-            if(userIds && projectIds) {
-                userIds.forEach(function(userId) {
-                    projectIds.forEach(function(projectId) {
-                        assignments.push({
-                            UserId: parseInt(userId),
-                            ProjectId: projectId,
-                            DueDate: dueDate
-                        });
+            userIds.forEach(function(userId) {
+                projectIds.forEach(function(projectId) {
+                    assignments.push({
+                        UserId: parseInt(userId),
+                        ProjectId: parseInt(projectId),
+                        DueDate: dueDate
                     });
                 });
-            }
+            });
 
             $.ajax({
                 url: '/AssignProject/Assign',
@@ -272,6 +286,7 @@
                 }
             });
         });
+
 
         function openChangeDueDateModal(assignedId, currentDueDate, currentStatus) {
             $("#modalTitle").text("Change Due Date / Status");
