@@ -162,6 +162,8 @@
 
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
         var currentUserRole = "@(User.IsInRole("SuperAdmin") ? "SuperAdmin" : User.IsInRole("Admin") ? "Admin" : "Employee")";
 
@@ -183,23 +185,26 @@
             exportTableToCSV('users.csv', '#userTbl');
         });
 
-            $("#btnUserSave").click(function () {
-                $(this).prop("disabled", true);
-                var obj = {
-                    FullName: $("#FullName").val(),
-                    UserName: $("#UserName").val(),
-                    Age: $("#Age").val(),
-                    Email: $("#Email").val(),
-                    PhoneNumber: $("#PhoneNumber").val(),
-                    JoinedAt: $("#JoinedAt").val()
-                };
-                $.post('/User/Save', obj, function () {
-                    loadUsers();
-                    $("#userModal").modal('hide');
-                    clearUserForm();
-                    $("#btnUserSave").prop("disabled", false);
-                });
-            });
+                    $("#btnUserSave").click(function () {
+            $(this).prop("disabled", true);
+            var obj = {
+                FullName: $("#FullName").val(),
+                UserName: $("#UserName").val(),
+                Age: $("#Age").val(),
+                Email: $("#Email").val(),
+                PhoneNumber: $("#PhoneNumber").val(),
+                JoinedAt: $("#JoinedAt").val()
+            };
+
+            $.post('/User/Save', obj, function () {
+    loadUsers();
+    if (currentUserModal) currentUserModal.hide();
+    clearUserForm();
+    $("#btnUserSave").prop("disabled", false);
+});
+
+        });
+
 
                             $("#btnUserUpdate").click(function () {
             $(this).prop("disabled", true);
@@ -221,7 +226,7 @@
                 data: JSON.stringify(obj),
                         success: function () {
             loadUsers();
-            if (currentUserModal) currentUserModal.hide(); // use the same instance
+            if (currentUserModal) currentUserModal.hide(); 
             clearUserForm();
             $("#btnUserUpdate").prop("disabled", false);
         },
@@ -338,7 +343,7 @@
             $("#UserName").val("");
             $("#Age").val("");
             $("#Email").val("");
-            $("#Phone").val("");
+            $("#PhoneNumber").val("");
             $("#JoinedAt").val("");
             $("#btnUserSave").show();
             $("#btnUserUpdate").hide();
@@ -413,17 +418,22 @@
             });
         }
 
-
                 function openAddUserModal() {
             clearUserForm();
-                    $("#userModalLabel").text("Add User");
+            $("#userModalLabel").text("Add User");
             $("#btnUserSave").show();
             $("#btnUserUpdate").hide();
-            var userModal = new bootstrap.Modal(document.getElementById('userModal'));
-            userModal.show();
+
+            if (!currentUserModal) {
+                currentUserModal = new bootstrap.Modal(document.getElementById('userModal'));
+            }
+            currentUserModal.show();
         }
 
-                function openAssignRoleModal() {
+
+                      let assignRoleModalInstance;
+
+        function openAssignRoleModal() {
             $.get('/User/Get', function(data) {
                 $("#assignRoleUsers").empty();
                 $.each(data, function(i, user) {
@@ -433,9 +443,12 @@
                 });
             });
 
-            var modal = new bootstrap.Modal(document.getElementById('assignRoleModal'));
-            modal.show();
+            if (!assignRoleModalInstance) {
+                assignRoleModalInstance = new bootstrap.Modal(document.getElementById('assignRoleModal'));
+            }
+            assignRoleModalInstance.show();
         }
+
 
         function assignRole() {
             var selectedUsers = $("#assignRoleUsers").val(); 
@@ -446,13 +459,13 @@
                 return;
             }
 
-                          $.ajax({
+                                 $.ajax({
             url: '/User/AssignRole',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ userIds: selectedUsers.map(id => parseInt(id)), role: role }),
             success: function(res) {
-                $('#assignRoleModal').modal('hide');
+                if (assignRoleModalInstance) assignRoleModalInstance.hide();
                 loadUsers();
             },
             error: function(xhr, status, error) {
@@ -460,6 +473,7 @@
                 alert("Server error: " + error);
             }
         });
+
 }
 
 

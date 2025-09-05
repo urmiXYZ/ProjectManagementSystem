@@ -41,6 +41,7 @@
             <th>Project ID</th>
             <th>Project Name</th>
             <th>Description</th>
+            <th>Category</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -66,6 +67,18 @@
                     <input type="text" id="Description" class="form-control" required />
                 </div>
             </div>
+            <div class="mb-3">
+                <label for="CategoryId" class="form-label">Category:</label>
+                <select id="CategoryId" class="form-control">
+                    <option value="">Select Category</option>
+                    @foreach (var cat in ViewBag.Categories)
+                    {
+                        <option value="@cat.CategoryId">@cat.Name</option>
+                    }
+                </select>
+            </div>
+
+
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -92,8 +105,15 @@
                 $(this).prop("disabled", true);
                 var obj = {
                     ProjectName: $("#ProjectName").val(),
-                    Description: $("#Description").val()
+                    Description: $("#Description").val(),
+                    CategoryId: $("#CategoryId").val() 
                 };
+                        if (!obj.CategoryId) {
+            alert("Please select a category");
+            $("#btnSave").prop("disabled", false);
+            return;
+        }
+
                 $.ajax({
                     url: '/Project/Save',
                     type: 'POST',
@@ -116,8 +136,15 @@
                 var obj = {
                     ProjectId: $("#ProjectId").val(),
                     ProjectName: $("#ProjectName").val(),
-                    Description: $("#Description").val()
+                    Description: $("#Description").val(),
+                    CategoryId: $("#CategoryId").val() 
                 };
+                        if (!obj.CategoryId) {
+            alert("Please select a category");
+            $("#btnSave").prop("disabled", false);
+            return;
+        }
+
                 $.ajax({
                     url: '/Project/Update',
                     type: 'POST',
@@ -148,6 +175,8 @@
                         tr += "<td>" + item.projectId + "</td>";
                         tr += "<td>" + item.projectName + "</td>";
                         tr += "<td>" + item.description + "</td>";
+        tr += "<td>" + item.categoryName + "</td>";
+
                                tr += "<td><button class='btn btn-warning' onclick='edit(" + item.projectId + ")'><i class='fas fa-pen'></i></button> | ";
         tr += "<button class='btn btn-danger' onclick='deleteProject(" + item.projectId + ")'><i class='fas fa-trash'></i></button></td>";
 
@@ -197,7 +226,8 @@
                     $("#ProjectId").val(data.projectId);
                     $("#ProjectName").val(data.projectName);
                     $("#Description").val(data.description);
-                    $("#staticBackdrop").modal('show');
+        loadCategories(data.categoryId); 
+                            $("#staticBackdrop").modal('show');
                     $("#btnSave").hide();
                     $("#btnUpdate").show();
                 },
@@ -227,5 +257,30 @@
             $("#btnSave").show();
             $("#btnUpdate").hide();
         }
+
+                        function loadCategories(selectedId = null) {
+            $.get('/Project/GetCategories', function (data) {
+                var ddl = $("#CategoryId");
+                ddl.empty();
+                ddl.append('<option value="">-- Select Category --</option>');
+                $.each(data, function (i, c) {
+                    ddl.append(`<option value="${c.categoryId}" ${selectedId == c.categoryId ? 'selected' : ''}>${c.name}</option>`);
+                });
+            });
+        }
+
+
+        $("#staticBackdrop").on('show.bs.modal', function () {
+        });
+                function openAddProjectModal() {
+            clearAll();
+            loadCategories(); 
+            $("#staticBackdropLabel").text("Add Project");
+            $("#btnSave").show();
+            $("#btnUpdate").hide();
+            $("#staticBackdrop").modal('show');
+        }
+
+
     </script>
 }

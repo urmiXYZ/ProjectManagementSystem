@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProjectMannagementSystem.Models;
 
 namespace ProjectMannagementSystem.Controllers
@@ -15,14 +16,25 @@ namespace ProjectMannagementSystem.Controllers
         }
         public IActionResult Index()
         {
+            ViewBag.Categories = _dbContext.Categories.ToList();
             var tasks = _dbContext.Projects.ToList();
             return View(tasks);
         }
         [HttpGet]
         public IActionResult GetAll()
         {
-            var projects = _dbContext.Projects.ToList();
-            return Json(projects);
+            var projects = _dbContext.Projects
+                             .Include(p => p.Category) 
+                             .ToList();
+
+            var result = projects.Select(p => new {
+                ProjectId = p.ProjectId,
+                ProjectName = p.ProjectName,
+                Description = p.Description,
+                CategoryName = p.Category != null ? p.Category.Name : "None" 
+            }).ToList();
+
+            return Json(result);
         }
         public IActionResult Create()
         {
@@ -43,13 +55,24 @@ namespace ProjectMannagementSystem.Controllers
             return View(project);
         }
 
-
         [HttpGet]
         public IActionResult GetById(int id)
         {
-            var project = _dbContext.Projects.Find(id);
-            return Json(project);
+            var project = _dbContext.Projects
+                .Include(p => p.Category)
+                .FirstOrDefault(p => p.ProjectId == id);
+
+            if (project == null) return NotFound();
+
+            return Json(new
+            {
+                project.ProjectId,
+                project.ProjectName,
+                project.Description,
+                CategoryId = project.CategoryId
+            });
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Save(Project project)
@@ -89,5 +112,16 @@ namespace ProjectMannagementSystem.Controllers
             }
             return Json(new { msg = "Failed to delete" });
         }
+
+
+        [HttpGet]
+        public IActionResult GetCategories()
+        {
+            var categories = _dbContext.Categories
+                .Select(c => new { c.CategoryId, c.Name })
+                .ToList();
+            return Json(categories);
+        }
+
     }
 }
