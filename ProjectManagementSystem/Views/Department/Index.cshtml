@@ -55,7 +55,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="employeesList">
-                <!-- AJAX will fill this -->
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -194,7 +193,8 @@
                 }
             });
         });
-                function openEmployeesModal(deptId) {
+        
+        function openEmployeesModal(deptId) {
             fetch('/Department/GetEmployees?deptId=' + deptId)
                 .then(res => res.json())
                 .then(data => {

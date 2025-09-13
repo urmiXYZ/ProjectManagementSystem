@@ -8,32 +8,28 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0">Projects</h1>
-            </div><!-- /.col -->
+            </div>
 
-        </div><!-- /.row -->
-    </div><!-- /.container-fluid -->
+        </div>
+    </div>
 </div>
+
 <div class="mb-3 d-flex gap-2">
     <div class="d-flex align-items-center mt-4" style="gap: 10px; padding-left: 20px;">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
             Add New <i class="fa fa-plus" aria-hidden="true"></i>
         </button>
-
         <a href="/AssignProject/Index" class="btn btn-secondary">Assigned Projects</a>
-
         <button id="exportProjects" class="btn btn-success d-flex align-items-center justify-content-center">
             <i class="fa fa-file-excel me-2"></i> Export Projects
         </button>
     </div>
-
-
-
 </div>
+
 <div class="input-group mb-3">
     <span class="input-group-text"><i class="fa fa-search"></i></span>
-    <input type="text" id="searchProject" class="form-control" placeholder="Search by project name...">
+    <input type="text" id="searchProject" class="form-control" placeholder="Search by project/department name...">
 </div>
-
 
 <table id="tbl" class="table table-bordered">
     <thead>
@@ -42,6 +38,7 @@
             <th>Project Name</th>
             <th>Description</th>
             <th>Category</th>
+            <th>Department</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -55,7 +52,6 @@
                 <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Project</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
             <div class="modal-body">
                 <input type="hidden" id="ProjectId" />
                 <div class="mb-3">
@@ -66,20 +62,17 @@
                     <label for="Description" class="form-label">Description:</label>
                     <input type="text" id="Description" class="form-control" required />
                 </div>
+                <div class="mb-3">
+                    <label for="CategoryId" class="form-label">Category:</label>
+                    <select id="CategoryId" class="form-control">
+                        <option value="">Select Category</option>
+                        @foreach (var cat in ViewBag.Categories)
+                        {
+                            <option value="@cat.CategoryId">@cat.Name</option>
+                        }
+                    </select>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="CategoryId" class="form-label">Category:</label>
-                <select id="CategoryId" class="form-control">
-                    <option value="">Select Category</option>
-                    @foreach (var cat in ViewBag.Categories)
-                    {
-                        <option value="@cat.CategoryId">@cat.Name</option>
-                    }
-                </select>
-            </div>
-
-
-
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="btnSave">Save</button>
@@ -96,10 +89,9 @@
             $("#btnUpdate").hide();
             load();
 
-                    $("#exportProjects").click(function () {
+            $("#exportProjects").click(function () {
             exportTableToCSV('projects.csv', '#tbl'); 
         });
-
 
             $("#btnSave").click(function () {
                 $(this).prop("disabled", true);
@@ -139,11 +131,11 @@
                     Description: $("#Description").val(),
                     CategoryId: $("#CategoryId").val() 
                 };
-                        if (!obj.CategoryId) {
-            alert("Please select a category");
-            $("#btnSave").prop("disabled", false);
-            return;
-        }
+                if (!obj.CategoryId) {
+                alert("Please select a category");
+                $("#btnSave").prop("disabled", false);
+                return;
+                }
 
                 $.ajax({
                     url: '/Project/Update',
@@ -163,7 +155,7 @@
             });
         });
 
-               function load() {
+        function load() {
             $.ajax({
                 url: '/Project/GetAll',
                 type: 'GET',
@@ -175,28 +167,31 @@
                         tr += "<td>" + item.projectId + "</td>";
                         tr += "<td>" + item.projectName + "</td>";
                         tr += "<td>" + item.description + "</td>";
-        tr += "<td>" + item.categoryName + "</td>";
+                        tr += "<td>" + item.categoryName + "</td>";
+                        tr += "<td>" + item.departmentName + "</td>";
 
-                               tr += "<td><button class='btn btn-warning' onclick='edit(" + item.projectId + ")'><i class='fas fa-pen'></i></button> | ";
-        tr += "<button class='btn btn-danger' onclick='deleteProject(" + item.projectId + ")'><i class='fas fa-trash'></i></button></td>";
+                        tr += "<td><button class='btn btn-warning' onclick='edit(" + item.projectId + ")'><i class='fas fa-pen'></i></button> | ";
+                        tr += "<button class='btn btn-danger' onclick='deleteProject(" + item.projectId + ")'><i class='fas fa-trash'></i></button></td>";
 
                         tr += "</tr>";
                     });
                     $('#tbl tbody').html(tr);
 
-                    $("#searchProject").off("keyup").on("keyup", function () {
-                        var value = $(this).val().toLowerCase().trim();
-                        $("#tbl tbody tr").filter(function () {
-                            $(this).toggle($(this).find("td:eq(1)").text().toLowerCase().indexOf(value) > -1);
-                        });
-                    });
+            $("#searchProject").off("keyup").on("keyup", function () {
+            var value = $(this).val().toLowerCase().trim();
+            $("#tbl tbody tr").filter(function () {
+                var projectName = $(this).find("td:eq(1)").text().toLowerCase();
+                var departmentName = $(this).find("td:eq(4)").text().toLowerCase();
+                $(this).toggle(projectName.indexOf(value) > -1 || departmentName.indexOf(value) > -1);
+                });
+                });
                 },
                 error: function (xhr, status, error) {
                     console.error('Error loading projects:', error);
                 }
             });
         }
-                function exportTableToCSV(filename = 'table.csv', tableSelector = '#tbl') {
+        function exportTableToCSV(filename = 'table.csv', tableSelector = '#tbl') {
             var csv = [];
             var rows = document.querySelectorAll(tableSelector + " tr");
 
@@ -226,8 +221,8 @@
                     $("#ProjectId").val(data.projectId);
                     $("#ProjectName").val(data.projectName);
                     $("#Description").val(data.description);
-        loadCategories(data.categoryId); 
-                            $("#staticBackdrop").modal('show');
+                    loadCategories(data.categoryId); 
+                    $("#staticBackdrop").modal('show');
                     $("#btnSave").hide();
                     $("#btnUpdate").show();
                 },
@@ -258,7 +253,7 @@
             $("#btnUpdate").hide();
         }
 
-                        function loadCategories(selectedId = null) {
+        function loadCategories(selectedId = null) {
             $.get('/Project/GetCategories', function (data) {
                 var ddl = $("#CategoryId");
                 ddl.empty();
@@ -269,10 +264,10 @@
             });
         }
 
-
         $("#staticBackdrop").on('show.bs.modal', function () {
         });
-                function openAddProjectModal() {
+        
+        function openAddProjectModal() {
             clearAll();
             loadCategories(); 
             $("#staticBackdropLabel").text("Add Project");
@@ -280,7 +275,5 @@
             $("#btnUpdate").hide();
             $("#staticBackdrop").modal('show');
         }
-
-
     </script>
 }

@@ -26,7 +26,7 @@ namespace ProjectMannagementSystem.Controllers
         public IActionResult GetAll()
         {
             var projects = _dbContext.Projects
-                             .Include(p => p.Category) // Category includes Department
+                             .Include(p => p.Category)
                              .ThenInclude(c => c.Department)
                              .ToList();
 
@@ -35,11 +35,14 @@ namespace ProjectMannagementSystem.Controllers
                 ProjectName = p.ProjectName,
                 Description = p.Description,
                 CategoryName = p.Category != null ? p.Category.Name : "None",
-                DepartmentId = p.Category != null && p.Category.Department != null ? p.Category.Department.DepartmentId : (int?)null
+                DepartmentName = p.Category != null && p.Category.Department != null
+                                    ? p.Category.Department.Name
+                                    : "None"
             }).ToList();
 
             return Json(result);
         }
+
 
 
         [HttpGet]

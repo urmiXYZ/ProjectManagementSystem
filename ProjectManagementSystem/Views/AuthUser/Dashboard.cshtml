@@ -14,11 +14,11 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0">Dashboard</h1>
-                </div><!-- /.col -->
-
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
+                </div>
+            </div>
+        </div>
     </div>
+
     <div class="row">
         <div class="col-lg-4 col-6">
             <div class="small-box bg-info">
@@ -60,7 +60,6 @@
         </div>
     </div>
 
-
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">Recent Users</h3>
@@ -98,6 +97,7 @@
             </table>
         </div>
     </div>
+
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">Users by Role</h3>
@@ -107,6 +107,7 @@
         </div>
     </div>
 }
+
 else if (roles.Contains("Employee"))
 {
     <!-- Employee Dashboard -->
@@ -123,6 +124,7 @@ else if (roles.Contains("Employee"))
                 </a>
             </div>
         </div>
+
         <!-- Projects by Status Card -->
         <div class="col-lg-6 col-12">
             <div class="small-box bg-info">
@@ -137,6 +139,7 @@ else if (roles.Contains("Employee"))
             </div>
         </div>
     </div>
+
     <!-- Employee Calendar Widget -->
     <div class="row">
         <div class="col-12">
@@ -163,9 +166,6 @@ else if (roles.Contains("Employee"))
                         </div>
                     </div>
                 </div>
-
-
-
                 <div class="card-body">
                     <div id="employeeCalendar"></div>
                 </div>
@@ -173,12 +173,12 @@ else if (roles.Contains("Employee"))
         </div>
     </div>
 }
+
 @section Scripts {
     @if (roles.Contains("SuperAdmin") || roles.Contains("Admin"))
     {
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            // assign Razor values to JS variables
             var superAdmin = @Model.SuperAdminCount;
             var admin = @Model.AdminCount;
             var employee = @Model.EmployeeCount;

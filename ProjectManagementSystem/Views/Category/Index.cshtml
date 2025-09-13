@@ -28,7 +28,7 @@
                 <td>@(category.Department != null ? category.Department.Name : "None")</td>
                 <td>
                     <button class="btn btn-primary btn-sm"
-                            onclick="openEditCategoryModal(@category.CategoryId, '@category.Name', '@category.Description')">
+                            onclick="openEditCategoryModal(@category.CategoryId, '@category.Name', '@category.Description',@category.DepartmentId)">
                         <i class="fa fa-edit"></i>
                     </button>
                     <button class="btn btn-danger btn-sm"
@@ -36,9 +36,6 @@
                         <i class="fa fa-trash"></i>
                     </button>
                 </td>
-
-
-
             </tr>
         }
     </tbody>
@@ -73,7 +70,6 @@
                             }
                         </select>
                     </div>
-
                 </form>
             </div>
             <div class="modal-footer">
@@ -103,34 +99,40 @@
     </div>
 </div>
 
-
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
         function openAddCategoryModal() {
             $('#categoryModalTitle').text('Add Category');
             $('#CategoryId').val(0);
             $('#Name').val('');
             $('#Description').val('');
+            $('#DepartmentId').val('').trigger('change');
             var modal = new bootstrap.Modal(document.getElementById('categoryModal'));
             modal.show();
         }
 
-                function openEditCategoryModal(id, name, description, departmentId) {
+        function openEditCategoryModal(id, name, description, departmentId) {
             $('#categoryModalTitle').text('Edit Category');
             $('#CategoryId').val(id);
             $('#Name').val(name);
             $('#Description').val(description);
-            $('#DepartmentId').val(departmentId); 
+
+            if (departmentId) {
+                $('#DepartmentId').val(departmentId.toString());
+            } else {
+                $('#DepartmentId').val(""); 
+            }
+
             var modal = new bootstrap.Modal(document.getElementById('categoryModal'));
             modal.show();
         }
 
 
-                       let deleteCategoryId = 0;
 
-                function openDeleteConfirmModal(id) {
+        let deleteCategoryId = 0;
+
+        function openDeleteConfirmModal(id) {
             deleteCategoryId = id;
             var modalEl = document.getElementById('deleteConfirmModal');
             if (!modalEl.modalInstance) {
@@ -140,7 +142,7 @@
         }
 
 
-               $('#btnConfirmDelete').click(function() {
+        $('#btnConfirmDelete').click(function() {
             $.ajax({
                 url: '/Category/Delete/' + deleteCategoryId,
                 type: 'POST',

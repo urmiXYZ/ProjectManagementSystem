@@ -35,16 +35,18 @@ namespace ProjectMannagementSystem.Controllers
         public async Task<IActionResult> Get()
         {
             var users = await _userManager.Users
-                .Include(u => u.Department) // include department
+                .Include(u => u.Department)
+                 .Include(u => u.AssignedProjects)
                 .Select(u => new
                 {
                     id = u.Id,
                     fullName = u.FullName,
                     userName = u.UserName,
                     email = u.Email,
-                    departmentName = u.Department != null ? u.Department.Name : "None", // add department
-                    assignedProjects = u.AssignedProjects
-                        .Select(ap => new { projectName = ap.Project.ProjectName }).ToList()
+                    departmentid = u.DepartmentId ?? 0,
+                    departmentName = u.Department != null ? u.Department.Name : "None",
+                    assignedProjects = string.Join(",", u.AssignedProjects
+                        .Select(ap => ap.Project.ProjectName).ToList())
                 })
                 .ToListAsync();
 
@@ -64,7 +66,8 @@ namespace ProjectMannagementSystem.Controllers
                     u.fullName,
                     u.userName,
                     u.email,
-                    u.departmentName,        // include department here
+                    u.departmentName,
+                    u.departmentid,
                     u.assignedProjects,
                     role = roles.FirstOrDefault() ?? "None"
                 });
@@ -73,7 +76,7 @@ namespace ProjectMannagementSystem.Controllers
             return Json(result);
         }
 
-
+        [Authorize]
 
         public IActionResult Profile()
         {
@@ -108,10 +111,16 @@ namespace ProjectMannagementSystem.Controllers
                 departmentId = user.DepartmentId,
                 departmentName = user.Department != null ? user.Department.Name : "None",
                 assignedProjects = user.AssignedProjects
-                    .Select(ap => new { projectName = ap.Project.ProjectName })
-                    .ToList(),
-                role = roles.FirstOrDefault() ?? "None"
+        .Select(ap => new { projectName = ap.Project.ProjectName })
+        .ToList(),
+                role = roles.FirstOrDefault() ?? "None",
+                picturePath = string.IsNullOrEmpty(user.PicturePath)
+        ? Url.Content("~/Pictures/default-avatar.png")
+        : user.PicturePath,
+                isDefaultPicture = string.IsNullOrEmpty(user.PicturePath) 
             });
+
+
         }
 
 
@@ -132,7 +141,6 @@ namespace ProjectMannagementSystem.Controllers
 
                 await _userManager.AddToRoleAsync(user, "Employee");
 
-                // Only assign Department if role is Employee
                 if (user.DepartmentId.HasValue)
                 {
                     var employee = await _userManager.FindByIdAsync(user.Id.ToString());
@@ -161,7 +169,6 @@ namespace ProjectMannagementSystem.Controllers
             if (existingUser == null)
                 return Json(new { data = user, msg = "User does not exist" });
 
-            // Prevent employees from editing other users
             if (User.IsInRole("Employee"))
             {
                 var loggedInUserId = _userManager.GetUserId(User);
@@ -171,7 +178,6 @@ namespace ProjectMannagementSystem.Controllers
                 }
             }
 
-            // Basic fields
             existingUser.FullName = user.FullName;
             existingUser.UserName = user.UserName;
             existingUser.NormalizedUserName = user.UserName.ToUpper();
@@ -181,15 +187,14 @@ namespace ProjectMannagementSystem.Controllers
             existingUser.Age = user.Age;
             existingUser.JoinedAt = user.JoinedAt;
 
-            // 🔑 Department handling
             var roles = await _userManager.GetRolesAsync(existingUser);
             if (roles.Contains("Employee"))
             {
-                existingUser.DepartmentId = user.DepartmentId; // keep/update department
+                existingUser.DepartmentId = user.DepartmentId;
             }
             else
             {
-                existingUser.DepartmentId = null; // Admins / SuperAdmins → no dept
+                existingUser.DepartmentId = null;
             }
 
             var result = await _userManager.UpdateAsync(existingUser);
@@ -214,11 +219,9 @@ namespace ProjectMannagementSystem.Controllers
             var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null) return Json(new { success = false, msg = "User not found" });
 
-            // Security check
             if (user.Id != int.Parse(_userManager.GetUserId(User)))
                 return Forbid();
 
-            // Update profile info
             user.FullName = form["FullName"];
             user.UserName = form["UserName"];
             user.NormalizedUserName = user.UserName.ToUpper();
@@ -228,7 +231,6 @@ namespace ProjectMannagementSystem.Controllers
             user.Age = byte.Parse(form["Age"]);
             user.JoinedAt = DateTime.Parse(form["JoinedAt"]);
 
-            // Handle picture
             var file = form.Files["Picture"];
             if (file != null && file.Length > 0)
             {
@@ -334,7 +336,6 @@ namespace ProjectMannagementSystem.Controllers
                     await _userManager.RemoveFromRolesAsync(user, roles);
                     await _userManager.AddToRoleAsync(user, role);
 
-                    // 🔑 Handle department rules
                     if (role == "Admin" || role == "SuperAdmin")
                     {
                         user.DepartmentId = null;

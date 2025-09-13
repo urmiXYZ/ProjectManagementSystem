@@ -5,7 +5,7 @@ using ProjectMannagementSystem.Models;
 
 namespace ProjectMannagementSystem.Controllers
 {
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = "Admin,SuperAdmin")]
 
     public class CategoryController : Controller
     {
