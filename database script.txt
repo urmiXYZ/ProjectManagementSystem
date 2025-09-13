@@ -1,0 +1,595 @@
+USE [master]
+GO
+/****** Object:  Database [ProjectManagementDB]    Script Date: 9/13/2025 11:30:19 PM ******/
+CREATE DATABASE [ProjectManagementDB]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'ProjectManagementDB', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.SQLEXPRESS\MSSQL\DATA\ProjectManagementDB.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+ LOG ON 
+( NAME = N'ProjectManagementDB_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.SQLEXPRESS\MSSQL\DATA\ProjectManagementDB_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+ WITH CATALOG_COLLATION = DATABASE_DEFAULT
+GO
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [ProjectManagementDB].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+ALTER DATABASE [ProjectManagementDB] SET ANSI_NULL_DEFAULT OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET ANSI_NULLS OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET ANSI_PADDING OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET ANSI_WARNINGS OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET ARITHABORT OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET AUTO_CLOSE ON 
+GO
+ALTER DATABASE [ProjectManagementDB] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [ProjectManagementDB] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET CURSOR_DEFAULT  GLOBAL 
+GO
+ALTER DATABASE [ProjectManagementDB] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET QUOTED_IDENTIFIER OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET  ENABLE_BROKER 
+GO
+ALTER DATABASE [ProjectManagementDB] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET TRUSTWORTHY OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [ProjectManagementDB] SET READ_COMMITTED_SNAPSHOT ON 
+GO
+ALTER DATABASE [ProjectManagementDB] SET HONOR_BROKER_PRIORITY OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET RECOVERY SIMPLE 
+GO
+ALTER DATABASE [ProjectManagementDB] SET  MULTI_USER 
+GO
+ALTER DATABASE [ProjectManagementDB] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [ProjectManagementDB] SET DB_CHAINING OFF 
+GO
+ALTER DATABASE [ProjectManagementDB] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+GO
+ALTER DATABASE [ProjectManagementDB] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+GO
+ALTER DATABASE [ProjectManagementDB] SET DELAYED_DURABILITY = DISABLED 
+GO
+ALTER DATABASE [ProjectManagementDB] SET ACCELERATED_DATABASE_RECOVERY = OFF  
+GO
+ALTER DATABASE [ProjectManagementDB] SET QUERY_STORE = ON
+GO
+ALTER DATABASE [ProjectManagementDB] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 30), DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_STORAGE_SIZE_MB = 1000, QUERY_CAPTURE_MODE = AUTO, SIZE_BASED_CLEANUP_MODE = AUTO, MAX_PLANS_PER_QUERY = 200, WAIT_STATS_CAPTURE_MODE = ON)
+GO
+USE [ProjectManagementDB]
+GO
+/****** Object:  Table [dbo].[__EFMigrationsHistory]    Script Date: 9/13/2025 11:30:19 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[__EFMigrationsHistory](
+	[MigrationId] [nvarchar](150) NOT NULL,
+	[ProductVersion] [nvarchar](32) NOT NULL,
+ CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY CLUSTERED 
+(
+	[MigrationId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[AspNetRoleClaims]    Script Date: 9/13/2025 11:30:19 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[AspNetRoleClaims](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[RoleId] [int] NOT NULL,
+	[ClaimType] [nvarchar](max) NULL,
+	[ClaimValue] [nvarchar](max) NULL,
+ CONSTRAINT [PK_AspNetRoleClaims] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[AspNetRoles]    Script Date: 9/13/2025 11:30:19 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[AspNetRoles](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](256) NULL,
+	[NormalizedName] [nvarchar](256) NULL,
+	[ConcurrencyStamp] [nvarchar](max) NULL,
+ CONSTRAINT [PK_AspNetRoles] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[AspNetUserClaims]    Script Date: 9/13/2025 11:30:19 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[AspNetUserClaims](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[UserId] [int] NOT NULL,
+	[ClaimType] [nvarchar](max) NULL,
+	[ClaimValue] [nvarchar](max) NULL,
+ CONSTRAINT [PK_AspNetUserClaims] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[AspNetUserLogins]    Script Date: 9/13/2025 11:30:19 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[AspNetUserLogins](
+	[LoginProvider] [nvarchar](450) NOT NULL,
+	[ProviderKey] [nvarchar](450) NOT NULL,
+	[ProviderDisplayName] [nvarchar](max) NULL,
+	[UserId] [int] NOT NULL,
+ CONSTRAINT [PK_AspNetUserLogins] PRIMARY KEY CLUSTERED 
+(
+	[LoginProvider] ASC,
+	[ProviderKey] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[AspNetUserRoles]    Script Date: 9/13/2025 11:30:19 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[AspNetUserRoles](
+	[UserId] [int] NOT NULL,
+	[RoleId] [int] NOT NULL,
+ CONSTRAINT [PK_AspNetUserRoles] PRIMARY KEY CLUSTERED 
+(
+	[UserId] ASC,
+	[RoleId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[AspNetUsers]    Script Date: 9/13/2025 11:30:19 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[AspNetUsers](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Age] [tinyint] NOT NULL,
+	[JoinedAt] [datetime2](7) NOT NULL,
+	[UserName] [nvarchar](256) NULL,
+	[NormalizedUserName] [nvarchar](256) NULL,
+	[Email] [nvarchar](256) NOT NULL,
+	[NormalizedEmail] [nvarchar](256) NULL,
+	[EmailConfirmed] [bit] NOT NULL,
+	[PasswordHash] [nvarchar](max) NULL,
+	[SecurityStamp] [nvarchar](max) NULL,
+	[ConcurrencyStamp] [nvarchar](max) NULL,
+	[PhoneNumber] [nvarchar](max) NOT NULL,
+	[PhoneNumberConfirmed] [bit] NOT NULL,
+	[TwoFactorEnabled] [bit] NOT NULL,
+	[LockoutEnd] [datetimeoffset](7) NULL,
+	[LockoutEnabled] [bit] NOT NULL,
+	[AccessFailedCount] [int] NOT NULL,
+	[FullName] [nvarchar](100) NOT NULL,
+	[PicturePath] [nvarchar](max) NULL,
+	[DepartmentId] [int] NULL,
+ CONSTRAINT [PK_AspNetUsers] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[AspNetUserTokens]    Script Date: 9/13/2025 11:30:19 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[AspNetUserTokens](
+	[UserId] [int] NOT NULL,
+	[LoginProvider] [nvarchar](450) NOT NULL,
+	[Name] [nvarchar](450) NOT NULL,
+	[Value] [nvarchar](max) NULL,
+ CONSTRAINT [PK_AspNetUserTokens] PRIMARY KEY CLUSTERED 
+(
+	[UserId] ASC,
+	[LoginProvider] ASC,
+	[Name] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[AssignedProjects]    Script Date: 9/13/2025 11:30:19 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[AssignedProjects](
+	[AssignedId] [int] IDENTITY(1,1) NOT NULL,
+	[ProjectId] [int] NOT NULL,
+	[UserId] [int] NOT NULL,
+	[AssignedDate] [datetime2](7) NOT NULL,
+	[DueDate] [datetime2](7) NOT NULL,
+	[SubmitDate] [datetime2](7) NULL,
+	[Status] [int] NOT NULL,
+ CONSTRAINT [PK_AssignedProjects] PRIMARY KEY CLUSTERED 
+(
+	[AssignedId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Categories]    Script Date: 9/13/2025 11:30:19 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Categories](
+	[CategoryId] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](100) NOT NULL,
+	[Description] [nvarchar](500) NULL,
+	[DepartmentId] [int] NULL,
+ CONSTRAINT [PK_Categories] PRIMARY KEY CLUSTERED 
+(
+	[CategoryId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Departments]    Script Date: 9/13/2025 11:30:19 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Departments](
+	[DepartmentId] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](100) NOT NULL,
+	[Description] [nvarchar](500) NULL,
+ CONSTRAINT [PK_Departments] PRIMARY KEY CLUSTERED 
+(
+	[DepartmentId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Projects]    Script Date: 9/13/2025 11:30:19 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Projects](
+	[ProjectId] [int] IDENTITY(1,1) NOT NULL,
+	[ProjectName] [nvarchar](150) NOT NULL,
+	[Description] [nvarchar](1000) NOT NULL,
+	[CategoryId] [int] NULL,
+ CONSTRAINT [PK_Projects] PRIMARY KEY CLUSTERED 
+(
+	[ProjectId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+INSERT [dbo].[__EFMigrationsHistory] ([MigrationId], [ProductVersion]) VALUES (N'20250824174916_AddIdentity', N'8.0.0')
+GO
+INSERT [dbo].[__EFMigrationsHistory] ([MigrationId], [ProductVersion]) VALUES (N'20250827165743_UserModelUpdateWithFullName', N'8.0.0')
+GO
+INSERT [dbo].[__EFMigrationsHistory] ([MigrationId], [ProductVersion]) VALUES (N'20250827174700_updateDPforUser', N'8.0.0')
+GO
+INSERT [dbo].[__EFMigrationsHistory] ([MigrationId], [ProductVersion]) VALUES (N'20250905160333_FixCategoryForeignKey', N'8.0.0')
+GO
+INSERT [dbo].[__EFMigrationsHistory] ([MigrationId], [ProductVersion]) VALUES (N'20250905181204_DepartmentEntity', N'8.0.0')
+GO
+INSERT [dbo].[__EFMigrationsHistory] ([MigrationId], [ProductVersion]) VALUES (N'20250905192932_DeptEntityFull', N'8.0.0')
+GO
+SET IDENTITY_INSERT [dbo].[AspNetRoles] ON 
+GO
+INSERT [dbo].[AspNetRoles] ([Id], [Name], [NormalizedName], [ConcurrencyStamp]) VALUES (1, N'Employee', N'EMPLOYEE', NULL)
+GO
+INSERT [dbo].[AspNetRoles] ([Id], [Name], [NormalizedName], [ConcurrencyStamp]) VALUES (2, N'Admin', N'ADMIN', NULL)
+GO
+INSERT [dbo].[AspNetRoles] ([Id], [Name], [NormalizedName], [ConcurrencyStamp]) VALUES (3, N'SuperAdmin', N'SUPERADMIN', NULL)
+GO
+SET IDENTITY_INSERT [dbo].[AspNetRoles] OFF
+GO
+INSERT [dbo].[AspNetUserRoles] ([UserId], [RoleId]) VALUES (1, 1)
+GO
+INSERT [dbo].[AspNetUserRoles] ([UserId], [RoleId]) VALUES (5, 1)
+GO
+INSERT [dbo].[AspNetUserRoles] ([UserId], [RoleId]) VALUES (7, 1)
+GO
+INSERT [dbo].[AspNetUserRoles] ([UserId], [RoleId]) VALUES (15, 1)
+GO
+INSERT [dbo].[AspNetUserRoles] ([UserId], [RoleId]) VALUES (18, 1)
+GO
+INSERT [dbo].[AspNetUserRoles] ([UserId], [RoleId]) VALUES (4, 2)
+GO
+INSERT [dbo].[AspNetUserRoles] ([UserId], [RoleId]) VALUES (9, 2)
+GO
+INSERT [dbo].[AspNetUserRoles] ([UserId], [RoleId]) VALUES (8, 3)
+GO
+SET IDENTITY_INSERT [dbo].[AspNetUsers] ON 
+GO
+INSERT [dbo].[AspNetUsers] ([Id], [Age], [JoinedAt], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnd], [LockoutEnabled], [AccessFailedCount], [FullName], [PicturePath], [DepartmentId]) VALUES (1, 18, CAST(N'2025-02-04T00:00:00.0000000' AS DateTime2), N'fiona9', N'FIONA9', N'fio@gmail.com', N'FIO@GMAIL.COM', 0, N'AQAAAAIAAYagAAAAELsoQQ9DpNjI+uwqAhdvj69rc6JYdJD603FQkJlltlgxl86FXZDVWxMG7DxhOrLxxg==', N'X7M6U5AUSB5J5VBKNGN4JE3IICOFJWEH', N'80aafaca-bcea-465c-8a09-650838918e04', N'01882791412', 0, 0, NULL, 1, 0, N'Farzia Faruk Fiona', NULL, 4)
+GO
+INSERT [dbo].[AspNetUsers] ([Id], [Age], [JoinedAt], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnd], [LockoutEnabled], [AccessFailedCount], [FullName], [PicturePath], [DepartmentId]) VALUES (4, 18, CAST(N'2025-08-11T00:00:00.0000000' AS DateTime2), N'inaya', N'N.INAYA', N'n@gmail.com', N'N@GMAIL.COM', 0, N'AQAAAAIAAYagAAAAEOMvO+GqRJ4D4p096GL+dXKbjc3aBFDk8NVSKgHZVRr5KjO70xad049GbAdk5JFybw==', N'LUTQII2GBV6J5DTHWO54TTGGL6JBVPEC', N'b7a70535-466f-4b1d-a4a1-9c4b4da875e5', N'01794759911', 0, 0, NULL, 1, 0, N'Nusaiba Faruk Inaya', N'/Pictures/4.jpeg', NULL)
+GO
+INSERT [dbo].[AspNetUsers] ([Id], [Age], [JoinedAt], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnd], [LockoutEnabled], [AccessFailedCount], [FullName], [PicturePath], [DepartmentId]) VALUES (5, 18, CAST(N'2025-08-02T00:00:00.0000000' AS DateTime2), N'Urmi123', N'URMI123', N'u@gmail.com', N'U@GMAIL.COM', 0, N'AQAAAAIAAYagAAAAEEjyHcc5opdKPe4tjqWbu99vrifuh6QDE7B9jXMdXkrNkCE7u8kjo+NW+3acEhkWaA==', N'NTDX6HUF5HA744NOJ332BF25Y6IMEZVJ', N'c9a3e092-e7fd-4f50-94b2-f1ef74b7628d', N'01719142827', 0, 0, NULL, 1, 0, N'Farhana Faruk Urmi', N'/Pictures/5.jpg', 4)
+GO
+INSERT [dbo].[AspNetUsers] ([Id], [Age], [JoinedAt], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnd], [LockoutEnabled], [AccessFailedCount], [FullName], [PicturePath], [DepartmentId]) VALUES (7, 18, CAST(N'2025-08-11T00:00:00.0000000' AS DateTime2), N'rushaTuba', N'RUSHATUBA', N't@gmail.com', N'T@GMAIL.COM', 0, N'AQAAAAIAAYagAAAAEKimcoxi0Dgw5WRMDv9aEVvyRU2xgmF4N/664Y5ZVpFSm3/XNtX4hlc6OnuYv5oVUA==', N'GEPB2LXWRURORYRBGMJBG3JD63NTRUFN', N'9c12ce8f-9858-4145-9a50-4ed1b830e60b', N'01534134677', 0, 0, NULL, 1, 0, N'Rushaida Faruk Tuba', NULL, 4)
+GO
+INSERT [dbo].[AspNetUsers] ([Id], [Age], [JoinedAt], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnd], [LockoutEnabled], [AccessFailedCount], [FullName], [PicturePath], [DepartmentId]) VALUES (8, 19, CAST(N'2025-07-27T00:00:00.0000000' AS DateTime2), N'fims', N'FIMS', N'f@gmail.com', N'F@GMAIL.COM', 0, N'AQAAAAIAAYagAAAAEEqIZp469BkYm8INtLw+XFFXjtIogYAXz+kw6OZFIHe989qXeMe3zoWOkfEtVWM1Dg==', N'5UFPY5SCJU7MISGUVK5JHASSXGG2ZIKG', N'c632f5e7-4f23-4a47-9f70-f2e6673acf2f', N'01772591412', 0, 0, NULL, 1, 0, N'Fariha Faruk Fima', N'/Pictures/8.jpeg', NULL)
+GO
+INSERT [dbo].[AspNetUsers] ([Id], [Age], [JoinedAt], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnd], [LockoutEnabled], [AccessFailedCount], [FullName], [PicturePath], [DepartmentId]) VALUES (9, 27, CAST(N'2024-06-12T00:00:00.0000000' AS DateTime2), N'rahi123', N'RAHI123', N'r@gmail.com', N'R@GMAIL.COM', 0, N'AQAAAAIAAYagAAAAEGffUYNwVtMPHD9QiIORpRq+VK/M8aVyEx16kqkjTQ3WM0unvObGeo14TZK+TtlIBg==', N'FGPVQ77F3POEGANAYVMHK77GYXRMOTRZ', N'be62ee26-2798-4a95-ad59-86ad5dbabfcc', N'01794756766', 0, 0, NULL, 1, 0, N'Samiul Islam Rahi', NULL, NULL)
+GO
+INSERT [dbo].[AspNetUsers] ([Id], [Age], [JoinedAt], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnd], [LockoutEnabled], [AccessFailedCount], [FullName], [PicturePath], [DepartmentId]) VALUES (15, 18, CAST(N'2025-08-31T00:00:00.0000000' AS DateTime2), N'faiyazZ', N'FAIYAZZ', N'faiyaz@gmail.com', N'FAIYAZ@GMAIL.COM', 0, N'AQAAAAIAAYagAAAAEELYAbbGyyzfIuuDOJTzSNZF7cRmhMvw3mVuHhVvPpnzl0KsPnHD+sxuYNJbyBwRxA==', N'GPUSJILGYG32PT74UBIBNGPGZHOXQESV', N'da12a7cb-630f-4ff5-90cc-a1a42e4c8793', N'01534111177', 0, 0, NULL, 1, 0, N'Faiyaz Ahamed', NULL, 8)
+GO
+INSERT [dbo].[AspNetUsers] ([Id], [Age], [JoinedAt], [UserName], [NormalizedUserName], [Email], [NormalizedEmail], [EmailConfirmed], [PasswordHash], [SecurityStamp], [ConcurrencyStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnd], [LockoutEnabled], [AccessFailedCount], [FullName], [PicturePath], [DepartmentId]) VALUES (18, 19, CAST(N'2025-09-13T22:08:13.4850687' AS DateTime2), N'nira341', N'NIRA341', N'niraaa@yahoo.com', N'NIRAAA@YAHOO.COM', 0, N'AQAAAAIAAYagAAAAEBKQ2FLnqCG0S9cXNex1BMCCPp8Y1SLGHfOIpJWMqMquXdq85GsfYWW9QmW7pdvQYw==', N'FXMWPPAJPB3OS7B2GCGRM7NPW6KBCUXL', N'0ac12293-948b-42cd-8216-902c8f4a6979', N'01882791412', 0, 0, NULL, 1, 0, N'Nira Islam', NULL, 9)
+GO
+SET IDENTITY_INSERT [dbo].[AspNetUsers] OFF
+GO
+SET IDENTITY_INSERT [dbo].[AssignedProjects] ON 
+GO
+INSERT [dbo].[AssignedProjects] ([AssignedId], [ProjectId], [UserId], [AssignedDate], [DueDate], [SubmitDate], [Status]) VALUES (13, 2, 1, CAST(N'2025-09-13T21:55:23.4727023' AS DateTime2), CAST(N'2025-09-18T00:00:00.0000000' AS DateTime2), NULL, 0)
+GO
+INSERT [dbo].[AssignedProjects] ([AssignedId], [ProjectId], [UserId], [AssignedDate], [DueDate], [SubmitDate], [Status]) VALUES (14, 1, 5, CAST(N'2025-09-13T21:56:02.7858435' AS DateTime2), CAST(N'2025-09-27T00:00:00.0000000' AS DateTime2), NULL, 0)
+GO
+INSERT [dbo].[AssignedProjects] ([AssignedId], [ProjectId], [UserId], [AssignedDate], [DueDate], [SubmitDate], [Status]) VALUES (15, 3, 5, CAST(N'2025-09-13T21:59:37.6428179' AS DateTime2), CAST(N'2025-09-20T00:00:00.0000000' AS DateTime2), CAST(N'2025-09-13T22:01:43.5102102' AS DateTime2), 1)
+GO
+INSERT [dbo].[AssignedProjects] ([AssignedId], [ProjectId], [UserId], [AssignedDate], [DueDate], [SubmitDate], [Status]) VALUES (16, 5, 15, CAST(N'2025-09-13T22:25:25.5734186' AS DateTime2), CAST(N'2025-09-19T00:00:00.0000000' AS DateTime2), NULL, 0)
+GO
+INSERT [dbo].[AssignedProjects] ([AssignedId], [ProjectId], [UserId], [AssignedDate], [DueDate], [SubmitDate], [Status]) VALUES (17, 6, 18, CAST(N'2025-09-13T22:25:40.5149492' AS DateTime2), CAST(N'2025-09-20T00:00:00.0000000' AS DateTime2), NULL, 0)
+GO
+INSERT [dbo].[AssignedProjects] ([AssignedId], [ProjectId], [UserId], [AssignedDate], [DueDate], [SubmitDate], [Status]) VALUES (20, 13, 5, CAST(N'2025-09-13T22:26:42.4003704' AS DateTime2), CAST(N'2025-09-22T00:00:00.0000000' AS DateTime2), NULL, 2)
+GO
+SET IDENTITY_INSERT [dbo].[AssignedProjects] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Categories] ON 
+GO
+INSERT [dbo].[Categories] ([CategoryId], [Name], [Description], [DepartmentId]) VALUES (5, N'Software Development', N'Projects related to developing software applications, websites, or mobile apps.', 4)
+GO
+INSERT [dbo].[Categories] ([CategoryId], [Name], [Description], [DepartmentId]) VALUES (6, N'Marketing', N'Campaigns, social media promotions, and advertising projects.', 5)
+GO
+INSERT [dbo].[Categories] ([CategoryId], [Name], [Description], [DepartmentId]) VALUES (7, N'Human Resources', N'HR-related projects such as recruitment, onboarding, and training.', 3)
+GO
+INSERT [dbo].[Categories] ([CategoryId], [Name], [Description], [DepartmentId]) VALUES (8, N'Finance & Accounting', N'Projects related to budgeting, payroll, and financial audits.', 6)
+GO
+INSERT [dbo].[Categories] ([CategoryId], [Name], [Description], [DepartmentId]) VALUES (9, N'Research & Development', N'New product research, process improvement, or innovation projects.', 9)
+GO
+INSERT [dbo].[Categories] ([CategoryId], [Name], [Description], [DepartmentId]) VALUES (10, N'Customer Support', N'Projects to improve customer service or support processes.', 8)
+GO
+INSERT [dbo].[Categories] ([CategoryId], [Name], [Description], [DepartmentId]) VALUES (11, N'Operations & Logistics', N'Projects focused on supply chain, inventory, and operational efficiency.', 10)
+GO
+INSERT [dbo].[Categories] ([CategoryId], [Name], [Description], [DepartmentId]) VALUES (12, N'Design & Creative', N'Graphic design, UX/UI, branding, and creative content projects.', 4)
+GO
+INSERT [dbo].[Categories] ([CategoryId], [Name], [Description], [DepartmentId]) VALUES (13, N'Quality Assurance', N'Testing, QA processes, and compliance-related projects.', 4)
+GO
+INSERT [dbo].[Categories] ([CategoryId], [Name], [Description], [DepartmentId]) VALUES (14, N'IT Infrastructure', N'Network, server, and hardware-related projects.', 4)
+GO
+SET IDENTITY_INSERT [dbo].[Categories] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Departments] ON 
+GO
+INSERT [dbo].[Departments] ([DepartmentId], [Name], [Description]) VALUES (3, N'Human Resources', N'Handles recruitment, employee relations, and payroll.')
+GO
+INSERT [dbo].[Departments] ([DepartmentId], [Name], [Description]) VALUES (4, N'IT / Technology', N'Manages software, hardware, and IT infrastructure.')
+GO
+INSERT [dbo].[Departments] ([DepartmentId], [Name], [Description]) VALUES (5, N'Marketing', N'Responsible for branding, campaigns, and promotions.')
+GO
+INSERT [dbo].[Departments] ([DepartmentId], [Name], [Description]) VALUES (6, N'Finance', N'Manages budgets, accounts, and financial reporting.')
+GO
+INSERT [dbo].[Departments] ([DepartmentId], [Name], [Description]) VALUES (7, N'Sales', N'Handles client acquisition, sales targets, and leads.')
+GO
+INSERT [dbo].[Departments] ([DepartmentId], [Name], [Description]) VALUES (8, N'Customer Support', N'Provides support and resolves client issues.')
+GO
+INSERT [dbo].[Departments] ([DepartmentId], [Name], [Description]) VALUES (9, N'Research & Development', N'Develops new products and improves existing ones.')
+GO
+INSERT [dbo].[Departments] ([DepartmentId], [Name], [Description]) VALUES (10, N'Operations', N'Ensures smooth day-to-day business operations.')
+GO
+SET IDENTITY_INSERT [dbo].[Departments] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Projects] ON 
+GO
+INSERT [dbo].[Projects] ([ProjectId], [ProjectName], [Description], [CategoryId]) VALUES (1, N'Project Atlas', N'A web-based project management system to streamline tasks and team collaboration.', 5)
+GO
+INSERT [dbo].[Projects] ([ProjectId], [ProjectName], [Description], [CategoryId]) VALUES (2, N'TaskTracker Pro', N'An advanced task tracking tool with real-time notifications and analytics.', 14)
+GO
+INSERT [dbo].[Projects] ([ProjectId], [ProjectName], [Description], [CategoryId]) VALUES (3, N'TimeLine', N'A scheduling and calendar app to manage project deadlines efficiently.', 12)
+GO
+INSERT [dbo].[Projects] ([ProjectId], [ProjectName], [Description], [CategoryId]) VALUES (5, N'DevOps Dashboard', N'A monitoring and reporting tool for DevOps pipelines and deployments.', 10)
+GO
+INSERT [dbo].[Projects] ([ProjectId], [ProjectName], [Description], [CategoryId]) VALUES (6, N'CollabSpace', N'A platform for remote teams to communicate, assign tasks, and track progress.', 9)
+GO
+INSERT [dbo].[Projects] ([ProjectId], [ProjectName], [Description], [CategoryId]) VALUES (7, N'BudgetMaster', N'Financial tracking and budgeting application for project cost management.', 8)
+GO
+INSERT [dbo].[Projects] ([ProjectId], [ProjectName], [Description], [CategoryId]) VALUES (8, N'ResourcePlanner', N'Tool to manage employee allocation, workload, and project resources.', 7)
+GO
+INSERT [dbo].[Projects] ([ProjectId], [ProjectName], [Description], [CategoryId]) VALUES (9, N'AgileSprint Manager', N'Software to manage Agile sprints, backlog, and user stories.', 6)
+GO
+INSERT [dbo].[Projects] ([ProjectId], [ProjectName], [Description], [CategoryId]) VALUES (10, N'KnowledgeHub', N'Centralized knowledge repository with project documentation and collaboration features.', 11)
+GO
+INSERT [dbo].[Projects] ([ProjectId], [ProjectName], [Description], [CategoryId]) VALUES (13, N'Automated Test Suite Development', N'Create a comprehensive automated test suite for the company''s web application to reduce manual testing effort and improve release quality.', 13)
+GO
+INSERT [dbo].[Projects] ([ProjectId], [ProjectName], [Description], [CategoryId]) VALUES (14, N'QA Process Improvement', N'Analyze the current QA processes, identify bottlenecks, and implement process improvements to enhance testing efficiency and defect detection.', 13)
+GO
+INSERT [dbo].[Projects] ([ProjectId], [ProjectName], [Description], [CategoryId]) VALUES (15, N'Performance Testing for E-commerce Platform', N'Conduct performance and load testing to ensure the e-commerce platform can handle high traffic and provide a smooth user experience.', 13)
+GO
+INSERT [dbo].[Projects] ([ProjectId], [ProjectName], [Description], [CategoryId]) VALUES (16, N'Security Testing and Vulnerability Assessment', N'Perform security testing to identify vulnerabilities in the system and recommend solutions to strengthen application security.', 13)
+GO
+INSERT [dbo].[Projects] ([ProjectId], [ProjectName], [Description], [CategoryId]) VALUES (17, N'Regression Testing for Mobile Application', N'Execute regression testing on mobile apps after every release to ensure existing functionality is not broken by new features or updates.', 13)
+GO
+SET IDENTITY_INSERT [dbo].[Projects] OFF
+GO
+/****** Object:  Index [IX_AspNetRoleClaims_RoleId]    Script Date: 9/13/2025 11:30:32 PM ******/
+CREATE NONCLUSTERED INDEX [IX_AspNetRoleClaims_RoleId] ON [dbo].[AspNetRoleClaims]
+(
+	[RoleId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [RoleNameIndex]    Script Date: 9/13/2025 11:30:32 PM ******/
+CREATE UNIQUE NONCLUSTERED INDEX [RoleNameIndex] ON [dbo].[AspNetRoles]
+(
+	[NormalizedName] ASC
+)
+WHERE ([NormalizedName] IS NOT NULL)
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_AspNetUserClaims_UserId]    Script Date: 9/13/2025 11:30:32 PM ******/
+CREATE NONCLUSTERED INDEX [IX_AspNetUserClaims_UserId] ON [dbo].[AspNetUserClaims]
+(
+	[UserId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_AspNetUserLogins_UserId]    Script Date: 9/13/2025 11:30:32 PM ******/
+CREATE NONCLUSTERED INDEX [IX_AspNetUserLogins_UserId] ON [dbo].[AspNetUserLogins]
+(
+	[UserId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_AspNetUserRoles_RoleId]    Script Date: 9/13/2025 11:30:32 PM ******/
+CREATE NONCLUSTERED INDEX [IX_AspNetUserRoles_RoleId] ON [dbo].[AspNetUserRoles]
+(
+	[RoleId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [EmailIndex]    Script Date: 9/13/2025 11:30:32 PM ******/
+CREATE NONCLUSTERED INDEX [EmailIndex] ON [dbo].[AspNetUsers]
+(
+	[NormalizedEmail] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_AspNetUsers_DepartmentId]    Script Date: 9/13/2025 11:30:32 PM ******/
+CREATE NONCLUSTERED INDEX [IX_AspNetUsers_DepartmentId] ON [dbo].[AspNetUsers]
+(
+	[DepartmentId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [UserNameIndex]    Script Date: 9/13/2025 11:30:32 PM ******/
+CREATE UNIQUE NONCLUSTERED INDEX [UserNameIndex] ON [dbo].[AspNetUsers]
+(
+	[NormalizedUserName] ASC
+)
+WHERE ([NormalizedUserName] IS NOT NULL)
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_AssignedProjects_ProjectId]    Script Date: 9/13/2025 11:30:32 PM ******/
+CREATE NONCLUSTERED INDEX [IX_AssignedProjects_ProjectId] ON [dbo].[AssignedProjects]
+(
+	[ProjectId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_AssignedProjects_UserId]    Script Date: 9/13/2025 11:30:32 PM ******/
+CREATE NONCLUSTERED INDEX [IX_AssignedProjects_UserId] ON [dbo].[AssignedProjects]
+(
+	[UserId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_Categories_DepartmentId]    Script Date: 9/13/2025 11:30:32 PM ******/
+CREATE NONCLUSTERED INDEX [IX_Categories_DepartmentId] ON [dbo].[Categories]
+(
+	[DepartmentId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_Projects_CategoryId]    Script Date: 9/13/2025 11:30:32 PM ******/
+CREATE NONCLUSTERED INDEX [IX_Projects_CategoryId] ON [dbo].[Projects]
+(
+	[CategoryId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[AspNetUsers] ADD  DEFAULT (N'') FOR [Email]
+GO
+ALTER TABLE [dbo].[AspNetUsers] ADD  DEFAULT (N'') FOR [PhoneNumber]
+GO
+ALTER TABLE [dbo].[AspNetRoleClaims]  WITH CHECK ADD  CONSTRAINT [FK_AspNetRoleClaims_AspNetRoles_RoleId] FOREIGN KEY([RoleId])
+REFERENCES [dbo].[AspNetRoles] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[AspNetRoleClaims] CHECK CONSTRAINT [FK_AspNetRoleClaims_AspNetRoles_RoleId]
+GO
+ALTER TABLE [dbo].[AspNetUserClaims]  WITH CHECK ADD  CONSTRAINT [FK_AspNetUserClaims_AspNetUsers_UserId] FOREIGN KEY([UserId])
+REFERENCES [dbo].[AspNetUsers] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[AspNetUserClaims] CHECK CONSTRAINT [FK_AspNetUserClaims_AspNetUsers_UserId]
+GO
+ALTER TABLE [dbo].[AspNetUserLogins]  WITH CHECK ADD  CONSTRAINT [FK_AspNetUserLogins_AspNetUsers_UserId] FOREIGN KEY([UserId])
+REFERENCES [dbo].[AspNetUsers] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[AspNetUserLogins] CHECK CONSTRAINT [FK_AspNetUserLogins_AspNetUsers_UserId]
+GO
+ALTER TABLE [dbo].[AspNetUserRoles]  WITH CHECK ADD  CONSTRAINT [FK_AspNetUserRoles_AspNetRoles_RoleId] FOREIGN KEY([RoleId])
+REFERENCES [dbo].[AspNetRoles] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[AspNetUserRoles] CHECK CONSTRAINT [FK_AspNetUserRoles_AspNetRoles_RoleId]
+GO
+ALTER TABLE [dbo].[AspNetUserRoles]  WITH CHECK ADD  CONSTRAINT [FK_AspNetUserRoles_AspNetUsers_UserId] FOREIGN KEY([UserId])
+REFERENCES [dbo].[AspNetUsers] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[AspNetUserRoles] CHECK CONSTRAINT [FK_AspNetUserRoles_AspNetUsers_UserId]
+GO
+ALTER TABLE [dbo].[AspNetUsers]  WITH CHECK ADD  CONSTRAINT [FK_AspNetUsers_Departments_DepartmentId] FOREIGN KEY([DepartmentId])
+REFERENCES [dbo].[Departments] ([DepartmentId])
+GO
+ALTER TABLE [dbo].[AspNetUsers] CHECK CONSTRAINT [FK_AspNetUsers_Departments_DepartmentId]
+GO
+ALTER TABLE [dbo].[AspNetUserTokens]  WITH CHECK ADD  CONSTRAINT [FK_AspNetUserTokens_AspNetUsers_UserId] FOREIGN KEY([UserId])
+REFERENCES [dbo].[AspNetUsers] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[AspNetUserTokens] CHECK CONSTRAINT [FK_AspNetUserTokens_AspNetUsers_UserId]
+GO
+ALTER TABLE [dbo].[AssignedProjects]  WITH CHECK ADD  CONSTRAINT [FK_AssignedProjects_AspNetUsers_UserId] FOREIGN KEY([UserId])
+REFERENCES [dbo].[AspNetUsers] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[AssignedProjects] CHECK CONSTRAINT [FK_AssignedProjects_AspNetUsers_UserId]
+GO
+ALTER TABLE [dbo].[AssignedProjects]  WITH CHECK ADD  CONSTRAINT [FK_AssignedProjects_Projects_ProjectId] FOREIGN KEY([ProjectId])
+REFERENCES [dbo].[Projects] ([ProjectId])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[AssignedProjects] CHECK CONSTRAINT [FK_AssignedProjects_Projects_ProjectId]
+GO
+ALTER TABLE [dbo].[Categories]  WITH CHECK ADD  CONSTRAINT [FK_Categories_Departments_DepartmentId] FOREIGN KEY([DepartmentId])
+REFERENCES [dbo].[Departments] ([DepartmentId])
+GO
+ALTER TABLE [dbo].[Categories] CHECK CONSTRAINT [FK_Categories_Departments_DepartmentId]
+GO
+ALTER TABLE [dbo].[Projects]  WITH CHECK ADD  CONSTRAINT [FK_Projects_Categories_CategoryId] FOREIGN KEY([CategoryId])
+REFERENCES [dbo].[Categories] ([CategoryId])
+GO
+ALTER TABLE [dbo].[Projects] CHECK CONSTRAINT [FK_Projects_Categories_CategoryId]
+GO
+USE [master]
+GO
+ALTER DATABASE [ProjectManagementDB] SET  READ_WRITE 
+GO
