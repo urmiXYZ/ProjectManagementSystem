@@ -10,10 +10,8 @@ ProjectSphere is a **Project Management System** developed using **ASP.NET Core 
 - [Technologies Used](#technologies-used)  
 - [User Roles](#user-roles)  
 - [Installation](#installation)  
-- [Usage](#usage)  
 - [Screenshots](#screenshots)  
-- [Contributing](#contributing)  
-- [License](#license)  
+
 
 ---
 
@@ -54,6 +52,25 @@ ProjectSphere is a **Project Management System** developed using **ASP.NET Core 
 - **Bootstrap 5** for frontend styling  
 
 ---
+
+Database Setup (2019)
+
+This project includes a SQL script to create and populate the database with the required tables and sample data. You can use it to set up your local environment quickly. (file named DatabaseScript)
+
+---
+
+User Credentials
+
+Password = first 3 letters(in uppercase) of the username + *566#p
+
+| Username  | Password   |
+| --------- | ---------- |
+| farhana   | far\*566#p |
+| adminuser | adm\*566#p |
+| employee1 | emp\*566#p |
+
+
+The passwords are generated using the following rule:
 
 ## User Roles
 1. **Employee** – Can view and manage their assigned projects  
