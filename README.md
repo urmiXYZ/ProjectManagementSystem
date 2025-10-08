@@ -18,9 +18,9 @@ ProjectSphere is a **Project Management System** developed using **ASP.NET Core 
 ## Features
 
 ### General Features
-- User authentication and **role-based authorization**  
-- Home, About, and Privacy pages accessible without login  
-- Responsive and user-friendly dashboard  
+-User authentication and role-based authorization
+-Home, About, and Privacy pages accessible without login
+-Responsive and user-friendly dashboard
 
 ### Employee Features
 - View **assigned projects** and their statuses  
@@ -49,7 +49,8 @@ ProjectSphere is a **Project Management System** developed using **ASP.NET Core 
 - **Entity Framework Core**  
 - **ASP.NET Identity** for authentication  
 - **SQL Server** for database  
-- **Bootstrap 5** for frontend styling  
+- **Bootstrap 5** for frontend styling
+- **Ajax** **JQuery** **Razor**
 
 ---
 
