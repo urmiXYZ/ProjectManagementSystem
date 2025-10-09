@@ -8,6 +8,72 @@ Demo in YT: https://youtu.be/jk2F4MkLYFE?si=8hVq-BL50qqrovy-
 
 ---
 
+## Seeded Data
+
+This project comes with pre-populated (seeded) data in the database. The following data is automatically inserted when the application is run for the first time.
+
+---
+
+### 1. Departments
+| DepartmentId | Name                  | Description                       |
+|--------------|---------------------|-----------------------------------|
+| 1            | Software Development | Handles backend and frontend apps |
+| 2            | HR                   | Handles recruitment and employee management |
+| 3            | Marketing            | Promotes products and manages campaigns |
+
+---
+
+### 2. Roles
+| RoleId | Name       |
+|--------|------------|
+| 1      | SuperAdmin |
+| 2      | Admin      |
+| 3      | Employee   |
+
+---
+
+### 3. Users
+| Id | UserName    | Email                  | Role       | Department            | Password       |
+|----|------------|-----------------------|------------|---------------------|----------------|
+| 1  | superadmin | superadmin@pms.com    | SuperAdmin | Software Development | Super@123      |
+| 2  | admin      | admin@pms.com         | Admin      | HR                  | Admin@123      |
+| 3  | employee   | employee@pms.com      | Employee   | Marketing           | Employee@123   |
+
+> **Note:** Passwords above are the default seeded passwords for demo/testing purposes.
+
+---
+
+### 4. Categories
+| CategoryId | Name               | Department              |
+|------------|------------------|------------------------|
+| 1          | Web Applications  | Software Development   |
+| 2          | Recruitment       | HR                     |
+| 3          | Digital Campaigns | Marketing              |
+
+---
+
+### 5. Projects
+| ProjectId | ProjectName         | Category             |
+|-----------|-------------------|--------------------|
+| 1         | Task Manager API   | Web Applications    |
+| 2         | Hiring Portal      | Recruitment         |
+| 3         | Social Media Boost | Digital Campaigns   |
+
+---
+
+### 6. Assigned Projects
+| AssignedId | Project          | User     | Status      | DueDate             |
+|------------|-----------------|---------|------------|--------------------|
+| 1          | Task Manager API | employee | InProgress | 15 days from today |
+
+---
+
+### How it works
+- Seeded data is inserted automatically via **Entity Framework Core `HasData()`** in the `ProjectDbContext`.  
+- Make sure **migrations are applied** before running the application, otherwise the seed data will not populate.
+
+---
+
 ## Table of Contents
 
 - [Features](#features)  
