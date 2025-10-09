@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace ProjectManagementSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class AddIdentity : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,45 +29,17 @@ namespace ProjectManagementSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUsers",
+                name: "Departments",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    DepartmentId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Age = table.Column<byte>(type: "tinyint", nullable: false),
-                    JoinedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Projects",
-                columns: table => new
-                {
-                    ProjectId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ProjectName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Projects", x => x.ProjectId);
+                    table.PrimaryKey("PK_Departments", x => x.DepartmentId);
                 });
 
             migrationBuilder.CreateTable(
@@ -87,6 +61,62 @@ namespace ProjectManagementSystem.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Age = table.Column<byte>(type: "tinyint", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    JoinedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PicturePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DepartmentId = table.Column<int>(type: "int", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "Departments",
+                        principalColumn: "DepartmentId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Categories",
+                columns: table => new
+                {
+                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    DepartmentId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Categories", x => x.CategoryId);
+                    table.ForeignKey(
+                        name: "FK_Categories_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "Departments",
+                        principalColumn: "DepartmentId");
                 });
 
             migrationBuilder.CreateTable(
@@ -175,6 +205,26 @@ namespace ProjectManagementSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Projects",
+                columns: table => new
+                {
+                    ProjectId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProjectName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Projects", x => x.ProjectId);
+                    table.ForeignKey(
+                        name: "FK_Projects_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "CategoryId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AssignedProjects",
                 columns: table => new
                 {
@@ -203,6 +253,71 @@ namespace ProjectManagementSystem.Migrations
                         principalColumn: "ProjectId",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { 1, null, "SuperAdmin", "SUPERADMIN" },
+                    { 2, null, "Admin", "ADMIN" },
+                    { 3, null, "Employee", "EMPLOYEE" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Departments",
+                columns: new[] { "DepartmentId", "Description", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Handles backend and frontend apps", "Software Development" },
+                    { 2, "Handles recruitment and employee management", "HR" },
+                    { 3, "Promotes products and manages campaigns", "Marketing" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "Age", "ConcurrencyStamp", "DepartmentId", "Email", "EmailConfirmed", "FullName", "JoinedAt", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "PicturePath", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[,]
+                {
+                    { 1, 0, (byte)35, "25948aac-fe45-4e7b-8187-e71d7d88215c", 1, "superadmin@pms.com", true, "Super Admin User", new DateTime(2025, 10, 9, 21, 59, 46, 445, DateTimeKind.Local).AddTicks(9645), false, null, "SUPERADMIN@PMS.COM", "SUPERADMIN", "AQAAAAIAAYagAAAAEJ33AqP5Bdo7BnzEVESBx2jnCZgtXWdBF8Ambr3MVcasTixxkZIqCULXgjz7IFTs9w==", "01711111111", false, null, "035c8eca-3202-4a3f-9f13-0aac7e284f92", false, "superadmin" },
+                    { 2, 0, (byte)30, "e35407ec-842c-459b-a43c-ded8d012543c", 2, "admin@pms.com", true, "Admin User", new DateTime(2025, 10, 9, 21, 59, 46, 508, DateTimeKind.Local).AddTicks(1244), false, null, "ADMIN@PMS.COM", "ADMIN", "AQAAAAIAAYagAAAAEAoI3TPe3GV13/HGUUYCX0aCECR/glSxdYp+K919syy4kifBOptFP99TfrapnxhS0Q==", "01722222222", false, null, "26ba43b0-4b55-4b51-9cc1-486a04cb49e5", false, "admin" },
+                    { 3, 0, (byte)25, "248bd3df-301f-42a4-add1-e1c67fec4574", 3, "employee@pms.com", true, "Employee User", new DateTime(2025, 10, 9, 21, 59, 46, 569, DateTimeKind.Local).AddTicks(4062), false, null, "EMPLOYEE@PMS.COM", "EMPLOYEE", "AQAAAAIAAYagAAAAEGszZL4jPMgs6zEFtfpDpG86yBQat19jy4cGXHY9Bg/w8AlnBtC+N2be2nNvqZZytg==", "01733333333", false, null, "b76fa194-2718-4d7c-b36e-de18b8501e1f", false, "employee" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Categories",
+                columns: new[] { "CategoryId", "DepartmentId", "Description", "Name" },
+                values: new object[,]
+                {
+                    { 1, 1, "Web-based systems", "Web Applications" },
+                    { 2, 2, "Hiring process and tools", "Recruitment" },
+                    { 3, 3, "Social media and ad marketing", "Digital Campaigns" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[,]
+                {
+                    { 1, 1 },
+                    { 2, 2 },
+                    { 3, 3 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Projects",
+                columns: new[] { "ProjectId", "CategoryId", "Description", "ProjectName" },
+                values: new object[,]
+                {
+                    { 1, 1, "Backend for managing tasks", "Task Manager API" },
+                    { 2, 2, "Web system for job postings", "Hiring Portal" },
+                    { 3, 3, "Automated ad campaign tool", "Social Media Boost" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AssignedProjects",
+                columns: new[] { "AssignedId", "AssignedDate", "DueDate", "ProjectId", "Status", "SubmitDate", "UserId" },
+                values: new object[] { 1, new DateTime(2025, 10, 9, 21, 59, 46, 631, DateTimeKind.Local).AddTicks(1032), new DateTime(2025, 10, 24, 21, 59, 46, 631, DateTimeKind.Local).AddTicks(1033), 1, 0, null, 3 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -237,6 +352,11 @@ namespace ProjectManagementSystem.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_DepartmentId",
+                table: "AspNetUsers",
+                column: "DepartmentId");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -252,6 +372,16 @@ namespace ProjectManagementSystem.Migrations
                 name: "IX_AssignedProjects_UserId",
                 table: "AssignedProjects",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Categories_DepartmentId",
+                table: "Categories",
+                column: "DepartmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projects_CategoryId",
+                table: "Projects",
+                column: "CategoryId");
         }
 
         /// <inheritdoc />
@@ -283,6 +413,12 @@ namespace ProjectManagementSystem.Migrations
 
             migrationBuilder.DropTable(
                 name: "Projects");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "Departments");
         }
     }
 }

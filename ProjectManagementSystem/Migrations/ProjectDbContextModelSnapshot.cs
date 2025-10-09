@@ -50,6 +50,26 @@ namespace ProjectManagementSystem.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "SuperAdmin",
+                            NormalizedName = "SUPERADMIN"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Employee",
+                            NormalizedName = "EMPLOYEE"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -134,6 +154,23 @@ namespace ProjectManagementSystem.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            UserId = 2,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            UserId = 3,
+                            RoleId = 3
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
@@ -172,9 +209,6 @@ namespace ProjectManagementSystem.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<string>("SampleFilePath")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -191,6 +225,17 @@ namespace ProjectManagementSystem.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AssignedProjects");
+
+                    b.HasData(
+                        new
+                        {
+                            AssignedId = 1,
+                            AssignedDate = new DateTime(2025, 10, 9, 21, 59, 46, 631, DateTimeKind.Local).AddTicks(1032),
+                            DueDate = new DateTime(2025, 10, 24, 21, 59, 46, 631, DateTimeKind.Local).AddTicks(1033),
+                            ProjectId = 1,
+                            Status = 0,
+                            UserId = 3
+                        });
                 });
 
             modelBuilder.Entity("ProjectMannagementSystem.Models.Category", b =>
@@ -218,6 +263,29 @@ namespace ProjectManagementSystem.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryId = 1,
+                            DepartmentId = 1,
+                            Description = "Web-based systems",
+                            Name = "Web Applications"
+                        },
+                        new
+                        {
+                            CategoryId = 2,
+                            DepartmentId = 2,
+                            Description = "Hiring process and tools",
+                            Name = "Recruitment"
+                        },
+                        new
+                        {
+                            CategoryId = 3,
+                            DepartmentId = 3,
+                            Description = "Social media and ad marketing",
+                            Name = "Digital Campaigns"
+                        });
                 });
 
             modelBuilder.Entity("ProjectMannagementSystem.Models.Department", b =>
@@ -240,6 +308,26 @@ namespace ProjectManagementSystem.Migrations
                     b.HasKey("DepartmentId");
 
                     b.ToTable("Departments");
+
+                    b.HasData(
+                        new
+                        {
+                            DepartmentId = 1,
+                            Description = "Handles backend and frontend apps",
+                            Name = "Software Development"
+                        },
+                        new
+                        {
+                            DepartmentId = 2,
+                            Description = "Handles recruitment and employee management",
+                            Name = "HR"
+                        },
+                        new
+                        {
+                            DepartmentId = 3,
+                            Description = "Promotes products and manages campaigns",
+                            Name = "Marketing"
+                        });
                 });
 
             modelBuilder.Entity("ProjectMannagementSystem.Models.Project", b =>
@@ -268,6 +356,29 @@ namespace ProjectManagementSystem.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Projects");
+
+                    b.HasData(
+                        new
+                        {
+                            ProjectId = 1,
+                            CategoryId = 1,
+                            Description = "Backend for managing tasks",
+                            ProjectName = "Task Manager API"
+                        },
+                        new
+                        {
+                            ProjectId = 2,
+                            CategoryId = 2,
+                            Description = "Web system for job postings",
+                            ProjectName = "Hiring Portal"
+                        },
+                        new
+                        {
+                            ProjectId = 3,
+                            CategoryId = 3,
+                            Description = "Automated ad campaign tool",
+                            ProjectName = "Social Media Boost"
+                        });
                 });
 
             modelBuilder.Entity("ProjectMannagementSystem.Models.User", b =>
@@ -357,6 +468,71 @@ namespace ProjectManagementSystem.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccessFailedCount = 0,
+                            Age = (byte)35,
+                            ConcurrencyStamp = "25948aac-fe45-4e7b-8187-e71d7d88215c",
+                            DepartmentId = 1,
+                            Email = "superadmin@pms.com",
+                            EmailConfirmed = true,
+                            FullName = "Super Admin User",
+                            JoinedAt = new DateTime(2025, 10, 9, 21, 59, 46, 445, DateTimeKind.Local).AddTicks(9645),
+                            LockoutEnabled = false,
+                            NormalizedEmail = "SUPERADMIN@PMS.COM",
+                            NormalizedUserName = "SUPERADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJ33AqP5Bdo7BnzEVESBx2jnCZgtXWdBF8Ambr3MVcasTixxkZIqCULXgjz7IFTs9w==",
+                            PhoneNumber = "01711111111",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "035c8eca-3202-4a3f-9f13-0aac7e284f92",
+                            TwoFactorEnabled = false,
+                            UserName = "superadmin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AccessFailedCount = 0,
+                            Age = (byte)30,
+                            ConcurrencyStamp = "e35407ec-842c-459b-a43c-ded8d012543c",
+                            DepartmentId = 2,
+                            Email = "admin@pms.com",
+                            EmailConfirmed = true,
+                            FullName = "Admin User",
+                            JoinedAt = new DateTime(2025, 10, 9, 21, 59, 46, 508, DateTimeKind.Local).AddTicks(1244),
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@PMS.COM",
+                            NormalizedUserName = "ADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAoI3TPe3GV13/HGUUYCX0aCECR/glSxdYp+K919syy4kifBOptFP99TfrapnxhS0Q==",
+                            PhoneNumber = "01722222222",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "26ba43b0-4b55-4b51-9cc1-486a04cb49e5",
+                            TwoFactorEnabled = false,
+                            UserName = "admin"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AccessFailedCount = 0,
+                            Age = (byte)25,
+                            ConcurrencyStamp = "248bd3df-301f-42a4-add1-e1c67fec4574",
+                            DepartmentId = 3,
+                            Email = "employee@pms.com",
+                            EmailConfirmed = true,
+                            FullName = "Employee User",
+                            JoinedAt = new DateTime(2025, 10, 9, 21, 59, 46, 569, DateTimeKind.Local).AddTicks(4062),
+                            LockoutEnabled = false,
+                            NormalizedEmail = "EMPLOYEE@PMS.COM",
+                            NormalizedUserName = "EMPLOYEE",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGszZL4jPMgs6zEFtfpDpG86yBQat19jy4cGXHY9Bg/w8AlnBtC+N2be2nNvqZZytg==",
+                            PhoneNumber = "01733333333",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "b76fa194-2718-4d7c-b36e-de18b8501e1f",
+                            TwoFactorEnabled = false,
+                            UserName = "employee"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
