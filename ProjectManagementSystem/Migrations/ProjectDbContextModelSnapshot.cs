@@ -2,8 +2,8 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProjectMannagementSystem.Models;
 
 #nullable disable
@@ -18,36 +18,35 @@ namespace ProjectManagementSystem.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.0")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
 
@@ -76,18 +75,18 @@ namespace ProjectManagementSystem.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("RoleId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -100,18 +99,18 @@ namespace ProjectManagementSystem.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -123,16 +122,16 @@ namespace ProjectManagementSystem.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -144,10 +143,10 @@ namespace ProjectManagementSystem.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("RoleId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -176,16 +175,16 @@ namespace ProjectManagementSystem.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
@@ -196,27 +195,27 @@ namespace ProjectManagementSystem.Migrations
                 {
                     b.Property<int>("AssignedId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AssignedId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AssignedId"));
 
                     b.Property<DateTime>("AssignedDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("DueDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("ProjectId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Status")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("SubmitDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("AssignedId");
 
@@ -230,8 +229,8 @@ namespace ProjectManagementSystem.Migrations
                         new
                         {
                             AssignedId = 1,
-                            AssignedDate = new DateTime(2025, 10, 9, 21, 59, 46, 631, DateTimeKind.Local).AddTicks(1032),
-                            DueDate = new DateTime(2025, 10, 24, 21, 59, 46, 631, DateTimeKind.Local).AddTicks(1033),
+                            AssignedDate = new DateTime(2025, 10, 12, 21, 44, 52, 196, DateTimeKind.Local).AddTicks(1096),
+                            DueDate = new DateTime(2025, 10, 27, 21, 44, 52, 196, DateTimeKind.Local).AddTicks(1096),
                             ProjectId = 1,
                             Status = 0,
                             UserId = 3
@@ -242,21 +241,21 @@ namespace ProjectManagementSystem.Migrations
                 {
                     b.Property<int>("CategoryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CategoryId"));
 
                     b.Property<int?>("DepartmentId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("CategoryId");
 
@@ -292,18 +291,18 @@ namespace ProjectManagementSystem.Migrations
                 {
                     b.Property<int>("DepartmentId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DepartmentId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DepartmentId"));
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                        .HasColumnType("character varying(300)");
 
                     b.HasKey("DepartmentId");
 
@@ -334,22 +333,22 @@ namespace ProjectManagementSystem.Migrations
                 {
                     b.Property<int>("ProjectId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProjectId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProjectId"));
 
                     b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<string>("ProjectName")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("character varying(150)");
 
                     b.HasKey("ProjectId");
 
@@ -385,75 +384,75 @@ namespace ProjectManagementSystem.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<byte>("Age")
-                        .HasColumnType("tinyint");
+                        .HasColumnType("smallint");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int?>("DepartmentId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("JoinedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("PicturePath")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
 
@@ -464,8 +463,7 @@ namespace ProjectManagementSystem.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+                        .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
 
@@ -475,19 +473,19 @@ namespace ProjectManagementSystem.Migrations
                             Id = 1,
                             AccessFailedCount = 0,
                             Age = (byte)35,
-                            ConcurrencyStamp = "25948aac-fe45-4e7b-8187-e71d7d88215c",
+                            ConcurrencyStamp = "f1a4be9b-798a-40c9-845c-c3bb28aadbc8",
                             DepartmentId = 1,
                             Email = "superadmin@pms.com",
                             EmailConfirmed = true,
                             FullName = "Super Admin User",
-                            JoinedAt = new DateTime(2025, 10, 9, 21, 59, 46, 445, DateTimeKind.Local).AddTicks(9645),
+                            JoinedAt = new DateTime(2025, 10, 12, 21, 44, 52, 5, DateTimeKind.Local).AddTicks(6603),
                             LockoutEnabled = false,
                             NormalizedEmail = "SUPERADMIN@PMS.COM",
                             NormalizedUserName = "SUPERADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJ33AqP5Bdo7BnzEVESBx2jnCZgtXWdBF8Ambr3MVcasTixxkZIqCULXgjz7IFTs9w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOG99VUsqJwL6oVY5Vgh/+wvUYGVWG/wjFmt35fpTPlkHiAKPdaPZvYv1d4gkRaHOg==",
                             PhoneNumber = "01711111111",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "035c8eca-3202-4a3f-9f13-0aac7e284f92",
+                            SecurityStamp = "8ed0cc4f-aa1a-4cfa-8cfd-cdcf1480ee95",
                             TwoFactorEnabled = false,
                             UserName = "superadmin"
                         },
@@ -496,19 +494,19 @@ namespace ProjectManagementSystem.Migrations
                             Id = 2,
                             AccessFailedCount = 0,
                             Age = (byte)30,
-                            ConcurrencyStamp = "e35407ec-842c-459b-a43c-ded8d012543c",
+                            ConcurrencyStamp = "c3d957a6-3518-4b56-a201-85ff487ea399",
                             DepartmentId = 2,
                             Email = "admin@pms.com",
                             EmailConfirmed = true,
                             FullName = "Admin User",
-                            JoinedAt = new DateTime(2025, 10, 9, 21, 59, 46, 508, DateTimeKind.Local).AddTicks(1244),
+                            JoinedAt = new DateTime(2025, 10, 12, 21, 44, 52, 69, DateTimeKind.Local).AddTicks(2984),
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@PMS.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAoI3TPe3GV13/HGUUYCX0aCECR/glSxdYp+K919syy4kifBOptFP99TfrapnxhS0Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMimmpIG6npM9wWhMdAkbmEo9AHNXYK7sfAAWIpvxKftmmpLCa2M8p7Gbq1xIIvZzA==",
                             PhoneNumber = "01722222222",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "26ba43b0-4b55-4b51-9cc1-486a04cb49e5",
+                            SecurityStamp = "80e3a7c5-6219-4ab5-9777-b9c99f395c3a",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -517,19 +515,19 @@ namespace ProjectManagementSystem.Migrations
                             Id = 3,
                             AccessFailedCount = 0,
                             Age = (byte)25,
-                            ConcurrencyStamp = "248bd3df-301f-42a4-add1-e1c67fec4574",
+                            ConcurrencyStamp = "3a7fe320-94d7-47a7-a349-109d3f317914",
                             DepartmentId = 3,
                             Email = "employee@pms.com",
                             EmailConfirmed = true,
                             FullName = "Employee User",
-                            JoinedAt = new DateTime(2025, 10, 9, 21, 59, 46, 569, DateTimeKind.Local).AddTicks(4062),
+                            JoinedAt = new DateTime(2025, 10, 12, 21, 44, 52, 133, DateTimeKind.Local).AddTicks(1426),
                             LockoutEnabled = false,
                             NormalizedEmail = "EMPLOYEE@PMS.COM",
                             NormalizedUserName = "EMPLOYEE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGszZL4jPMgs6zEFtfpDpG86yBQat19jy4cGXHY9Bg/w8AlnBtC+N2be2nNvqZZytg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIKQxnie82cQa93MoGl0G2AVfalpL1x/qX30xL5MUtDnrCytdh7evmpXsrv+jt/X1Q==",
                             PhoneNumber = "01733333333",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b76fa194-2718-4d7c-b36e-de18b8501e1f",
+                            SecurityStamp = "4d8b4684-4a18-418e-abcb-99c9c2dcd9a5",
                             TwoFactorEnabled = false,
                             UserName = "employee"
                         });
